@@ -1,0 +1,774 @@
+{
+  "project": {
+    "name": "digital-vlad-website",
+    "description": "Personal portfolio website with app marketplace, admin panel, and services showcase",
+    "version": "1.0.0",
+    "workingDirectory": "/home/digital-vlad/.openclaw/workspace/projects/digital-vlad-website",
+    "createdAt": "2026-02-06T19:30:00.000Z"
+  },
+  "architecture": {
+    "stack": "Next.js 16, PostgreSQL, Prisma, Redis, Tailwind CSS, TypeScript",
+    "pattern": "Next.js App Router with Server Components",
+    "principles": [
+      "Server Components by default, Client Components when needed",
+      "Prisma for type-safe database access",
+      "Redis for caching app listings",
+      "Dark theme primary, light theme secondary"
+    ],
+    "relevantFiles": {
+      "src/app/": "Next.js App Router pages and layouts",
+      "src/components/": "Reusable UI components",
+      "src/lib/": "Utilities, database client, API helpers",
+      "prisma/": "Database schema and migrations"
+    }
+  },
+  "testing": {
+    "required": true,
+    "framework": "vitest",
+    "commands": {
+      "unit": "npm run test",
+      "all": "npm run test",
+      "coverage": "npm run test:coverage"
+    }
+  },
+  "linting": {
+    "commands": {
+      "check": "npm run lint",
+      "fix": "npm run lint:fix"
+    }
+  },
+  "phases": [
+    {
+      "id": "phase-1",
+      "name": "Project Setup & Infrastructure",
+      "description": "Initialize Next.js 16 project with database and core dependencies",
+      "completionPromise": "PHASE_1_SETUP_COMPLETE",
+      "approvalGate": false,
+      "verificationChecklist": [
+        "Next.js 16 project initialized with App Router",
+        "PostgreSQL connection working",
+        "Prisma configured with initial schema",
+        "Redis client configured",
+        "Tailwind CSS configured with dark/light themes",
+        "Project structure follows conventions",
+        "Dev server runs without errors"
+      ],
+      "tasks": [
+        {
+          "id": "task-1.1",
+          "title": "Initialize Next.js 16 project",
+          "description": "Create new Next.js 16 project with TypeScript, Tailwind, ESLint",
+          "priority": "critical",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "Next.js 16 with App Router",
+            "TypeScript configured",
+            "Tailwind CSS installed",
+            "ESLint + Prettier configured",
+            "Basic folder structure created (app, components, lib)"
+          ],
+          "testRequirements": [],
+          "dependencies": [],
+          "outputFiles": [
+            "package.json",
+            "tsconfig.json",
+            "tailwind.config.ts"
+          ],
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "task-1.2",
+          "title": "Configure database and Prisma",
+          "description": "Set up PostgreSQL connection and Prisma ORM",
+          "priority": "critical",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "Prisma installed and configured",
+            "Database connection string in .env",
+            "Initial schema with App, Category, AdminUser models",
+            "Prisma client generated",
+            "Database migrations run successfully"
+          ],
+          "testRequirements": [],
+          "dependencies": [
+            "task-1.1"
+          ],
+          "outputFiles": [
+            "prisma/schema.prisma",
+            ".env.example"
+          ],
+          "estimatedMinutes": 30
+        },
+        {
+          "id": "task-1.3",
+          "title": "Configure Redis and caching",
+          "description": "Set up Redis client for caching app listings",
+          "priority": "high",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "Redis client (ioredis) installed",
+            "Redis connection configured",
+            "Cache utility functions created",
+            "Cache invalidation helpers ready"
+          ],
+          "testRequirements": [],
+          "dependencies": [
+            "task-1.1"
+          ],
+          "outputFiles": [
+            "src/lib/redis.ts",
+            "src/lib/cache.ts"
+          ],
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "task-1.4",
+          "title": "Configure theme system",
+          "description": "Set up next-themes with dark/light mode and design tokens",
+          "priority": "high",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "next-themes installed and configured",
+            "Dark theme colors defined (primary dark bg, gold accents)",
+            "Light theme colors defined (Joey-style white bg, colorful cards)",
+            "Theme toggle component created",
+            "CSS variables for theme tokens"
+          ],
+          "testRequirements": [],
+          "dependencies": [
+            "task-1.1"
+          ],
+          "outputFiles": [
+            "src/app/globals.css",
+            "src/components/theme-toggle.tsx"
+          ],
+          "estimatedMinutes": 25
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "name": "Database Models & Admin Backend",
+      "description": "Implement database models, admin authentication, and API routes",
+      "completionPromise": "PHASE_2_BACKEND_COMPLETE",
+      "approvalGate": false,
+      "verificationChecklist": [
+        "All Prisma models implemented (App, Category, AdminUser)",
+        "Admin authentication working (JWT or session)",
+        "CRUD API routes for apps working",
+        "CRUD API routes for categories working",
+        "Image upload endpoint working",
+        "API routes protected with auth middleware"
+      ],
+      "tasks": [
+        {
+          "id": "task-2.1",
+          "title": "Implement Prisma models",
+          "description": "Create complete database schema with all fields",
+          "priority": "critical",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "App model: id, title, slug, description, icon_url, screenshots, external_link, category_id, accent_color, is_published, position, timestamps",
+            "Category model: id, name, slug, icon, position, timestamps",
+            "AdminUser model: id, email, password_hash, timestamps",
+            "Proper relations between App and Category",
+            "Unique constraints on slugs and email"
+          ],
+          "testRequirements": [
+            "test_app_model_creation()",
+            "test_category_model_creation()",
+            "test_app_category_relation()"
+          ],
+          "dependencies": [
+            "task-1.2"
+          ],
+          "outputFiles": [
+            "prisma/schema.prisma"
+          ],
+          "estimatedMinutes": 30
+        },
+        {
+          "id": "task-2.2",
+          "title": "Implement admin authentication",
+          "description": "Create admin login system with protected routes",
+          "priority": "critical",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "Login API route (/api/admin/login)",
+            "JWT token generation and validation",
+            "Auth middleware for protected routes",
+            "Logout functionality",
+            "Password hashing with bcrypt"
+          ],
+          "testRequirements": [
+            "test_admin_login_success()",
+            "test_admin_login_invalid_credentials()",
+            "test_protected_route_without_token()"
+          ],
+          "dependencies": [
+            "task-2.1"
+          ],
+          "outputFiles": [
+            "src/app/api/admin/login/route.ts",
+            "src/lib/auth.ts"
+          ],
+          "estimatedMinutes": 45
+        },
+        {
+          "id": "task-2.3",
+          "title": "Implement category CRUD API",
+          "description": "Create REST API endpoints for category management",
+          "priority": "high",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "GET /api/admin/categories - List all categories",
+            "POST /api/admin/categories - Create category",
+            "PATCH /api/admin/categories/[id] - Update category",
+            "DELETE /api/admin/categories/[id] - Delete category",
+            "All routes protected with auth",
+            "Proper error handling and validation"
+          ],
+          "testRequirements": [
+            "test_list_categories()",
+            "test_create_category()",
+            "test_update_category()",
+            "test_delete_category()"
+          ],
+          "dependencies": [
+            "task-2.2"
+          ],
+          "outputFiles": [
+            "src/app/api/admin/categories/route.ts"
+          ],
+          "estimatedMinutes": 40
+        },
+        {
+          "id": "task-2.4",
+          "title": "Implement app CRUD API",
+          "description": "Create REST API endpoints for app management",
+          "priority": "critical",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "GET /api/admin/apps - List all apps with categories",
+            "POST /api/admin/apps - Create app",
+            "PATCH /api/admin/apps/[id] - Update app",
+            "DELETE /api/admin/apps/[id] - Delete app",
+            "PATCH /api/admin/apps/reorder - Update app positions",
+            "All routes protected with auth",
+            "Cache invalidation on mutations"
+          ],
+          "testRequirements": [
+            "test_list_apps()",
+            "test_create_app()",
+            "test_update_app()",
+            "test_delete_app()",
+            "test_reorder_apps()"
+          ],
+          "dependencies": [
+            "task-2.3"
+          ],
+          "outputFiles": [
+            "src/app/api/admin/apps/route.ts"
+          ],
+          "estimatedMinutes": 50
+        },
+        {
+          "id": "task-2.5",
+          "title": "Implement image upload",
+          "description": "Create image upload endpoint for icons and screenshots",
+          "priority": "high",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "POST /api/admin/upload - Upload image",
+            "Store images in /public/uploads or configured storage",
+            "Return image URL after upload",
+            "Validate file type and size",
+            "Support for multiple file uploads (screenshots)"
+          ],
+          "testRequirements": [
+            "test_upload_single_image()",
+            "test_upload_invalid_file_type()"
+          ],
+          "dependencies": [
+            "task-2.2"
+          ],
+          "outputFiles": [
+            "src/app/api/admin/upload/route.ts"
+          ],
+          "estimatedMinutes": 35
+        },
+        {
+          "id": "task-2.6",
+          "title": "Implement public API endpoints",
+          "description": "Create public API for frontend to fetch apps and categories",
+          "priority": "high",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "GET /api/apps - List published apps with categories (cached)",
+            "GET /api/apps/[slug] - Get single app by slug (cached)",
+            "GET /api/categories - List categories with app counts (cached)",
+            "Redis caching implemented",
+            "Proper error handling"
+          ],
+          "testRequirements": [
+            "test_public_apps_list()",
+            "test_public_app_detail()",
+            "test_public_categories()"
+          ],
+          "dependencies": [
+            "task-2.4"
+          ],
+          "outputFiles": [
+            "src/app/api/apps/route.ts"
+          ],
+          "estimatedMinutes": 40
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "name": "Admin Panel Frontend",
+      "description": "Build admin dashboard with CRUD interfaces for apps and categories",
+      "completionPromise": "PHASE_3_ADMIN_COMPLETE",
+      "approvalGate": false,
+      "verificationChecklist": [
+        "Admin login page working",
+        "Admin dashboard with navigation",
+        "App management UI (list, create, edit, delete)",
+        "Category management UI",
+        "Image upload working in forms",
+        "Drag-and-drop reordering for apps",
+        "Responsive admin layout"
+      ],
+      "tasks": [
+        {
+          "id": "task-3.1",
+          "title": "Create admin layout and login",
+          "description": "Build admin authentication UI and layout shell",
+          "priority": "critical",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "Admin login page (/admin/login)",
+            "Admin layout with sidebar navigation",
+            "Auth state management (context or cookies)",
+            "Protected route wrapper component",
+            "Logout functionality"
+          ],
+          "testRequirements": [
+            "test_login_form_renders()",
+            "test_login_form_validation()"
+          ],
+          "dependencies": [
+            "task-2.2"
+          ],
+          "outputFiles": [
+            "src/app/admin/login/page.tsx",
+            "src/app/admin/layout.tsx"
+          ],
+          "estimatedMinutes": 45
+        },
+        {
+          "id": "task-3.2",
+          "title": "Create category management UI",
+          "description": "Build CRUD interface for categories",
+          "priority": "high",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "Categories list page (/admin/categories)",
+            "Create category form (modal or page)",
+            "Edit category form",
+            "Delete category with confirmation",
+            "Form validation",
+            "Loading and error states"
+          ],
+          "testRequirements": [
+            "test_categories_list_renders()",
+            "test_create_category_form()"
+          ],
+          "dependencies": [
+            "task-3.1",
+            "task-2.3"
+          ],
+          "outputFiles": [
+            "src/app/admin/categories/page.tsx"
+          ],
+          "estimatedMinutes": 50
+        },
+        {
+          "id": "task-3.3",
+          "title": "Create app management UI",
+          "description": "Build CRUD interface for apps with image uploads",
+          "priority": "critical",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "Apps list page (/admin/apps) with cards/table",
+            "Create app form with all fields",
+            "Edit app form",
+            "Delete app with confirmation",
+            "Icon upload with preview",
+            "Screenshots upload (multiple) with preview",
+            "Category selector dropdown",
+            "Accent color picker",
+            "Published toggle"
+          ],
+          "testRequirements": [
+            "test_apps_list_renders()",
+            "test_create_app_form()",
+            "test_image_upload_component()"
+          ],
+          "dependencies": [
+            "task-3.2",
+            "task-2.4",
+            "task-2.5"
+          ],
+          "outputFiles": [
+            "src/app/admin/apps/page.tsx",
+            "src/app/admin/apps/new/page.tsx"
+          ],
+          "estimatedMinutes": 90
+        },
+        {
+          "id": "task-3.4",
+          "title": "Implement app reordering",
+          "description": "Add drag-and-drop reordering for apps",
+          "priority": "medium",
+          "status": "deferred",
+          "acceptanceCriteria": [
+            "Drag-and-drop reordering on apps list",
+            "Visual feedback during drag",
+            "Persist new order to database",
+            "Works within category filters"
+          ],
+          "testRequirements": [],
+          "dependencies": [
+            "task-3.3"
+          ],
+          "outputFiles": [],
+          "estimatedMinutes": 40
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "name": "Public Frontend",
+      "description": "Build the public-facing website sections",
+      "completionPromise": "PHASE_4_FRONTEND_COMPLETE",
+      "approvalGate": false,
+      "verificationChecklist": [
+        "Hero section with avatar, tagline, social links",
+        "Marketplace section with app grid and category filter",
+        "App detail pages with screenshots gallery",
+        "Services section with static cards",
+        "Footer with links and contact",
+        "Dark/light theme toggle working",
+        "Responsive on mobile/tablet/desktop",
+        "Smooth animations and transitions"
+      ],
+      "tasks": [
+        {
+          "id": "task-4.1",
+          "title": "Create shared UI components",
+          "description": "Build reusable components for public site",
+          "priority": "critical",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "Button component with variants",
+            "Card component for apps",
+            "Container/layout components",
+            "Social link icons component",
+            "Navigation header component",
+            "Footer component",
+            "All components support dark/light themes"
+          ],
+          "testRequirements": [
+            "test_button_variants()",
+            "test_card_renders()"
+          ],
+          "dependencies": [
+            "task-1.4"
+          ],
+          "outputFiles": [
+            "src/components/ui/"
+          ],
+          "estimatedMinutes": 60
+        },
+        {
+          "id": "task-4.2",
+          "title": "Build Hero section",
+          "description": "Create the landing hero with personal intro",
+          "priority": "critical",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "Avatar/profile image display",
+            "Tagline text (\"I build apps and ship fast\" or similar)",
+            "Social links (Telegram, Instagram, YouTube)",
+            "CTA button scrolls to marketplace",
+            "Responsive layout",
+            "Matches FutureTech/Joey design references"
+          ],
+          "testRequirements": [
+            "test_hero_renders_correctly()"
+          ],
+          "dependencies": [
+            "task-4.1"
+          ],
+          "outputFiles": [
+            "src/components/sections/hero.tsx"
+          ],
+          "estimatedMinutes": 45
+        },
+        {
+          "id": "task-4.3",
+          "title": "Build Marketplace section",
+          "description": "Create the app grid with category filtering",
+          "priority": "critical",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "Grid layout of app cards",
+            "Each card shows: icon, title, description, accent color bg",
+            "Category filter tabs or dropdown",
+            "Cards link to detail pages",
+            "Loading skeleton while fetching",
+            "Empty state when no apps",
+            "Colorful card backgrounds per app"
+          ],
+          "testRequirements": [
+            "test_marketplace_renders_apps()",
+            "test_category_filter_works()"
+          ],
+          "dependencies": [
+            "task-4.1",
+            "task-2.6"
+          ],
+          "outputFiles": [
+            "src/components/sections/marketplace.tsx",
+            "src/components/app-card.tsx"
+          ],
+          "estimatedMinutes": 70
+        },
+        {
+          "id": "task-4.4",
+          "title": "Build App detail page",
+          "description": "Create individual app pages with full info",
+          "priority": "critical",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "Dynamic route /apps/[slug]",
+            "App title and description",
+            "Screenshots gallery/carousel",
+            "External link button",
+            "Category badge",
+            "Back to marketplace link",
+            "SEO meta tags",
+            "Accent color theming"
+          ],
+          "testRequirements": [
+            "test_app_detail_renders()"
+          ],
+          "dependencies": [
+            "task-4.3"
+          ],
+          "outputFiles": [
+            "src/app/apps/[slug]/page.tsx"
+          ],
+          "estimatedMinutes": 50
+        },
+        {
+          "id": "task-4.5",
+          "title": "Build Services section",
+          "description": "Create static services showcase",
+          "priority": "high",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "Service cards (Personal Coaching, AI Integration, Dev Services)",
+            "Description for each service",
+            "Contact CTA (email: vladkomudrich@gmail.com)",
+            "Responsive grid layout",
+            "Matches design system"
+          ],
+          "testRequirements": [
+            "test_services_renders()"
+          ],
+          "dependencies": [
+            "task-4.1"
+          ],
+          "outputFiles": [
+            "src/components/sections/services.tsx"
+          ],
+          "estimatedMinutes": 35
+        },
+        {
+          "id": "task-4.6",
+          "title": "Assemble homepage",
+          "description": "Combine all sections into the main page",
+          "priority": "critical",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "Homepage combines Hero, Marketplace, Services, Footer",
+            "Smooth scroll navigation",
+            "Theme toggle in header",
+            "Responsive across all breakpoints",
+            "Performance optimized (lazy loading, etc.)"
+          ],
+          "testRequirements": [
+            "test_homepage_renders_all_sections()"
+          ],
+          "dependencies": [
+            "task-4.2",
+            "task-4.3",
+            "task-4.5"
+          ],
+          "outputFiles": [
+            "src/app/page.tsx"
+          ],
+          "estimatedMinutes": 40
+        }
+      ]
+    },
+    {
+      "id": "phase-5",
+      "name": "Polish & Documentation",
+      "description": "Final testing, styling polish, and documentation",
+      "completionPromise": "PHASE_5_COMPLETE",
+      "approvalGate": false,
+      "verificationChecklist": [
+        "All tests passing",
+        "No lint errors",
+        "Animations and transitions smooth",
+        "Mobile responsive verified",
+        "SEO meta tags on all pages",
+        "README with setup instructions",
+        "Environment variables documented",
+        "Seed script for initial data"
+      ],
+      "tasks": [
+        {
+          "id": "task-5.1",
+          "title": "Add animations and polish",
+          "description": "Implement smooth transitions and micro-interactions",
+          "priority": "medium",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "Page transitions with subtle fade",
+            "Card hover animations",
+            "Button hover/active states",
+            "Loading skeleton animations",
+            "Scroll-triggered animations (optional)",
+            "Theme toggle animation"
+          ],
+          "testRequirements": [],
+          "dependencies": [
+            "task-4.6"
+          ],
+          "outputFiles": [],
+          "estimatedMinutes": 40
+        },
+        {
+          "id": "task-5.2",
+          "title": "SEO and performance optimization",
+          "description": "Add meta tags, optimize images, improve performance",
+          "priority": "high",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "Meta tags on all pages (title, description, OG)",
+            "Sitemap generated",
+            "Images optimized with next/image",
+            "Proper heading hierarchy",
+            "Core Web Vitals acceptable"
+          ],
+          "testRequirements": [],
+          "dependencies": [
+            "task-4.6"
+          ],
+          "outputFiles": [
+            "src/app/sitemap.ts"
+          ],
+          "estimatedMinutes": 35
+        },
+        {
+          "id": "task-5.3",
+          "title": "Create seed script",
+          "description": "Create database seed with sample data",
+          "priority": "medium",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "Seed script creates admin user",
+            "Seed creates sample categories",
+            "Seed creates sample apps (Frise, etc.)",
+            "Can run via npm run seed"
+          ],
+          "testRequirements": [],
+          "dependencies": [
+            "task-2.1"
+          ],
+          "outputFiles": [
+            "prisma/seed.ts"
+          ],
+          "estimatedMinutes": 25
+        },
+        {
+          "id": "task-5.4",
+          "title": "Write documentation",
+          "description": "Create README and deployment docs",
+          "priority": "high",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "README with project overview",
+            "Setup instructions (dev environment)",
+            "Environment variables documented",
+            "Database setup instructions",
+            "Deployment guide (Vercel recommended)",
+            "Admin panel usage guide"
+          ],
+          "testRequirements": [],
+          "dependencies": [
+            "task-5.1",
+            "task-5.2",
+            "task-5.3"
+          ],
+          "outputFiles": [
+            "README.md",
+            "docs/deployment.md"
+          ],
+          "estimatedMinutes": 40
+        },
+        {
+          "id": "task-5.5",
+          "title": "Final testing and verification",
+          "description": "Run full test suite and manual QA",
+          "priority": "critical",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "All automated tests pass",
+            "No lint or type errors",
+            "Manual testing of all user flows",
+            "Admin panel fully functional",
+            "Public site renders correctly",
+            "Both themes verified"
+          ],
+          "testRequirements": [
+            "Run npm run test",
+            "Run npm run lint",
+            "Manual QA checklist"
+          ],
+          "dependencies": [
+            "task-5.4"
+          ],
+          "outputFiles": [
+            "logs/phases/phase-5.md"
+          ],
+          "estimatedMinutes": 45
+        }
+      ]
+    }
+  ],
+  "globalAcceptanceCriteria": [
+    "All tests pass",
+    "No lint errors",
+    "Admin panel fully functional",
+    "Public site renders correctly on all devices",
+    "Dark and light themes working",
+    "Redis caching working",
+    "Documentation complete"
+  ]
+}
