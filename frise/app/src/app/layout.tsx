@@ -1,21 +1,24 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Outfit, Fraunces } from "next/font/google";
 import { Providers } from "./providers";
 import { BottomNav } from "@/components/ui/BottomNav";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+// Body font: Modern geometric sans with excellent readability
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
   display: "swap",
-  weight: ["400", "500"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
-const jakarta = Plus_Jakarta_Sans({
-  variable: "--font-jakarta",
+// Display font: Distinctive soft serif with character - premium feel
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
   display: "swap",
-  weight: ["200", "300", "400", "500", "600", "700"],
+  weight: "variable",
+  axes: ["SOFT", "WONK", "opsz"],
 });
 
 export const metadata: Metadata = {
@@ -50,9 +53,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`${inter.variable} ${jakarta.variable} font-sans antialiased bg-background text-text-primary min-h-screen`}>
+      <body className={`${outfit.variable} ${fraunces.variable} font-sans antialiased bg-background text-text-primary min-h-screen`}>
         <Providers>
-          <main className="pb-24 md:pb-8">
+          {/* Noise texture overlay for visual depth */}
+          <div className="noise-overlay" aria-hidden="true" />
+          <main className="pb-24 md:pb-8 relative z-10">
             {children}
           </main>
           <BottomNav />
