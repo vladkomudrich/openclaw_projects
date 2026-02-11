@@ -40,22 +40,15 @@ const THERMAL_COLORS = {
   peak: "#FFB347",
 };
 
-// Grey colors for past
-const GREY_COLORS = {
-  fill: "rgba(80, 80, 90, 0.3)",
-  stroke: "#606068",
-};
-
 const ZONE_THRESHOLDS = {
   good: 75,
   moderate: 50,
   low: 25,
 };
 
-// Window configuration: 2h before + 2h after = 4h total
-const HOURS_BEFORE_NOW = 2;
-const HOURS_AFTER_NOW = 2;
-const SCROLL_THRESHOLD_MINUTES = 20;
+// Window: 4 hours visible (2h before + 2h after now)
+const VISIBLE_HOURS = 4;
+const SCROLL_THRESHOLD_MINUTES = 15;
 
 function getZone(value: number): string {
   if (value >= ZONE_THRESHOLDS.good) return "peak";
@@ -65,26 +58,10 @@ function getZone(value: number): string {
 }
 
 const ADVICE_MESSAGES: Record<string, string[]> = {
-  peak: [
-    "🔥 Peak focus! Tackle your hardest task.",
-    "💎 Prime time for deep work.",
-    "🎯 Maximum cognitive capacity.",
-  ],
-  good: [
-    "⚡ Great energy for productive work.",
-    "✨ Solid focus window.",
-    "💪 Good time for complex tasks.",
-  ],
-  moderate: [
-    "💫 Steady energy, good for routine work.",
-    "☕ Consider a quick break soon.",
-    "📋 Handle admin tasks now.",
-  ],
-  low: [
-    "🌙 Rest period, save hard tasks for later.",
-    "😴 Low energy, focus on light work.",
-    "🧘 Good time for a break.",
-  ],
+  peak: ["🔥 Peak focus!", "💎 Deep work time.", "🎯 Max capacity."],
+  good: ["⚡ Great energy.", "✨ Solid focus.", "💪 Complex tasks."],
+  moderate: ["💫 Steady energy.", "☕ Break soon?", "📋 Admin tasks."],
+  low: ["🌙 Rest period.", "😴 Light work.", "🧘 Take a break."],
 };
 
 export function ProductivityCurve({ 
@@ -95,6 +72,8 @@ export function ProductivityCurve({
 }: ProductivityCurveProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showNowButton, setShowNowButton] = useState(false);
+  const initialScrollRef = useRef<number>(0);
+  
   const [currentMinutes, setCurrentMinutes] = useState(() => {
     const now = new Date();
     return now.getHours() * 60 + now.getMinutes();
@@ -109,10 +88,10 @@ export function ProductivityCurve({
     return () => clearInterval(interval);
   }, []);
 
-  // Transform all points
+  // Transform all points (every 10 min for smoother curve)
   const allChartData: ChartDataPoint[] = useMemo(() => {
     return points
-      .filter((_, index) => index % 2 === 0) // Every 10 min
+      .filter((_, index) => index % 2 === 0)
       .map(point => {
         const timeStr = point.time.includes("T")
           ? format(parseISO(point.time), "HH:mm")
@@ -131,24 +110,38 @@ export function ProductivityCurve({
       });
   }, [points, currentMinutes]);
 
-  // Calculate the visible 4h window centered on now
-  const windowStart = currentMinutes - HOURS_BEFORE_NOW * 60;
-  const windowEnd = currentMinutes + HOURS_AFTER_NOW * 60;
-
-  // Get data for visible window (for initial view)
-  const windowData = useMemo(() => {
-    return allChartData.filter(d => 
-      d.minutesFromMidnight >= windowStart && 
-      d.minutesFromMidnight <= windowEnd
-    );
-  }, [allChartData, windowStart, windowEnd]);
+  // Calculate data range and chart width
+  const { firstMinute, lastMinute, totalMinutes, chartWidthPercent, nowPercent } = useMemo(() => {
+    if (allChartData.length === 0) return { 
+      firstMinute: 0, lastMinute: 1440, totalMinutes: 1440, 
+      chartWidthPercent: 100, nowPercent: 50 
+    };
+    
+    const first = allChartData[0].minutesFromMidnight;
+    const last = allChartData[allChartData.length - 1].minutesFromMidnight;
+    const total = last - first;
+    
+    // Chart should be wide enough so 4h fills the viewport
+    const visibleMinutes = VISIBLE_HOURS * 60; // 240 minutes
+    const widthMultiplier = total / visibleMinutes;
+    
+    // Where is "now" as a percentage of the data
+    const nowPct = ((currentMinutes - first) / total) * 100;
+    
+    return {
+      firstMinute: first,
+      lastMinute: last,
+      totalMinutes: total,
+      chartWidthPercent: Math.max(100, widthMultiplier * 100),
+      nowPercent: Math.max(0, Math.min(100, nowPct)),
+    };
+  }, [allChartData, currentMinutes]);
 
   // Find the "now" point for the dot marker
   const nowPoint = useMemo(() => {
-    // Find closest point to current time
-    let closest = windowData[0];
+    let closest = allChartData[0];
     let minDiff = Infinity;
-    for (const point of windowData) {
+    for (const point of allChartData) {
       const diff = Math.abs(point.minutesFromMidnight - currentMinutes);
       if (diff < minDiff) {
         minDiff = diff;
@@ -156,58 +149,49 @@ export function ProductivityCurve({
       }
     }
     return closest;
-  }, [windowData, currentMinutes]);
+  }, [allChartData, currentMinutes]);
 
-  // Track scroll position for "Now" button
-  const initialScrollRef = useRef<number | null>(null);
-  
-  const handleScroll = useCallback(() => {
-    if (!scrollContainerRef.current) return;
-    const container = scrollContainerRef.current;
-    
-    if (initialScrollRef.current === null) {
-      initialScrollRef.current = container.scrollLeft;
-    }
-    
-    const scrollDiff = Math.abs(container.scrollLeft - (initialScrollRef.current || 0));
-    const pixelsPerMinute = container.scrollWidth / allChartData.length / 10; // ~10min per point
-    const minutesMoved = scrollDiff / Math.max(pixelsPerMinute, 1);
-    
-    setShowNowButton(minutesMoved > SCROLL_THRESHOLD_MINUTES);
-  }, [allChartData.length]);
+  // Split index for gradient (where past meets future)
+  const splitIndex = useMemo(() => {
+    const idx = allChartData.findIndex(d => !d.isPast);
+    return idx === -1 ? allChartData.length : idx;
+  }, [allChartData]);
 
-  // Scroll to center on "now"
-  const scrollToNow = useCallback(() => {
-    if (!scrollContainerRef.current) return;
-    const container = scrollContainerRef.current;
-    
-    if (initialScrollRef.current !== null) {
-      container.scrollTo({
-        left: initialScrollRef.current,
-        behavior: "smooth",
-      });
-    }
-    setShowNowButton(false);
-  }, []);
-
-  // Initialize scroll position to show "now" in center
+  // Initialize scroll to center on "now"
   useEffect(() => {
     if (!scrollContainerRef.current) return;
     const container = scrollContainerRef.current;
     
-    // Calculate position to center the chart
-    const totalWidth = container.scrollWidth;
-    const viewWidth = container.clientWidth;
+    // Wait for layout
+    requestAnimationFrame(() => {
+      const scrollWidth = container.scrollWidth - container.clientWidth;
+      // Scroll so "now" is in the center
+      const targetScroll = (nowPercent / 100) * scrollWidth;
+      container.scrollLeft = targetScroll;
+      initialScrollRef.current = targetScroll;
+    });
+  }, [nowPercent, chartWidthPercent]);
+
+  // Handle scroll
+  const handleScroll = useCallback(() => {
+    if (!scrollContainerRef.current) return;
+    const container = scrollContainerRef.current;
+    const scrollDiff = Math.abs(container.scrollLeft - initialScrollRef.current);
+    const scrollWidth = container.scrollWidth - container.clientWidth;
+    const minutesMoved = (scrollDiff / scrollWidth) * totalMinutes;
     
-    // Find where "now" is in the full dataset
-    const nowIndex = allChartData.findIndex(d => d.minutesFromMidnight >= currentMinutes);
-    const nowPercent = nowIndex / allChartData.length;
-    
-    // Scroll to center "now"
-    const targetScroll = (nowPercent * totalWidth) - (viewWidth / 2);
-    container.scrollLeft = Math.max(0, targetScroll);
-    initialScrollRef.current = container.scrollLeft;
-  }, [allChartData, currentMinutes]);
+    setShowNowButton(minutesMoved > SCROLL_THRESHOLD_MINUTES);
+  }, [totalMinutes]);
+
+  // Scroll back to "now"
+  const scrollToNow = useCallback(() => {
+    if (!scrollContainerRef.current) return;
+    scrollContainerRef.current.scrollTo({
+      left: initialScrollRef.current,
+      behavior: "smooth",
+    });
+    setShowNowButton(false);
+  }, []);
 
   // Custom tooltip
   const CustomTooltip = useCallback(({ active, payload }: { active?: boolean; payload?: Array<{ payload: ChartDataPoint }> }) => {
@@ -215,28 +199,22 @@ export function ProductivityCurve({
     
     const data = payload[0].payload;
     const messages = ADVICE_MESSAGES[data.zone] || ADVICE_MESSAGES.moderate;
-    const messageIndex = Math.floor(Date.now() / 10000) % messages.length;
-    const message = messages[messageIndex];
+    const message = messages[Math.floor(Date.now() / 10000) % messages.length];
     
     return (
       <motion.div 
-        className="glass p-3 max-w-[180px]"
+        className="glass p-3 max-w-[160px]"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.15 }}
       >
-        <div className="text-lg font-display font-semibold text-[var(--text-primary)]">
+        <div className="text-base font-display font-semibold text-[var(--text-primary)]">
           {data.displayTime}
         </div>
-        <div className="stat-number text-[var(--accent-purple)] mt-0.5">
+        <div className="text-lg font-bold text-[var(--accent-purple)]">
           {data.value}%
         </div>
-        <div className="text-xs text-[var(--text-secondary)] mt-1 capitalize">
-          {data.zone === "peak" ? "Peak Focus" : data.zone} Zone
-          {data.isPast && " (past)"}
-        </div>
         {!data.isPast && (
-          <div className="text-xs text-[var(--text-muted)] mt-2 border-t border-[var(--glass-border)] pt-2">
+          <div className="text-xs text-[var(--text-muted)] mt-1 pt-1 border-t border-[var(--glass-border)]">
             {message}
           </div>
         )}
@@ -244,7 +222,7 @@ export function ProductivityCurve({
     );
   }, []);
 
-  // Melatonin window times
+  // Melatonin window
   const melatoninStart = useMemo(() => {
     if (!melatoninWindow) return null;
     return format(parseISO(melatoninWindow.startTime), "HH:mm");
@@ -255,12 +233,6 @@ export function ProductivityCurve({
     return format(parseISO(melatoninWindow.endTime), "HH:mm");
   }, [melatoninWindow]);
 
-  // Split data into past (grey) and future (colorful)
-  const splitIndex = windowData.findIndex(d => !d.isPast);
-
-  // Calculate chart width based on full data for scrolling
-  const chartWidthPercent = Math.max(100, (allChartData.length / windowData.length) * 100);
-
   return (
     <div className="w-full relative">
       {/* Scrollable container */}
@@ -268,40 +240,27 @@ export function ProductivityCurve({
         ref={scrollContainerRef}
         className="w-full overflow-x-auto"
         onScroll={handleScroll}
-        style={{ 
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         <div 
           className={showAnimation ? 'animate-draw-in' : ''}
-          style={{ 
-            width: `${chartWidthPercent}%`,
-            minWidth: '100%',
-          }}
+          style={{ width: `${chartWidthPercent}%`, minWidth: '100%' }}
         >
-          <div className="w-full h-[140px]">
+          <div className="w-full h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={allChartData}
-                margin={{ top: 24, right: 10, left: -20, bottom: 0 }}
+                margin={{ top: 20, right: 10, left: -20, bottom: 0 }}
               >
                 <defs>
-                  {/* Grey gradient for past */}
-                  <linearGradient id="greyFill" x1="0" y1="1" x2="0" y2="0">
-                    <stop offset="0%" stopColor="#3A3A42" stopOpacity={0.1} />
-                    <stop offset="100%" stopColor="#5A5A62" stopOpacity={0.25} />
+                  {/* Horizontal split gradient: grey left, color right */}
+                  <linearGradient id="splitGradient" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#4A4A52" stopOpacity={0.2} />
+                    <stop offset={`${Math.max(0, (splitIndex / allChartData.length) * 100)}%`} stopColor="#4A4A52" stopOpacity={0.2} />
+                    <stop offset={`${Math.min(100, (splitIndex / allChartData.length) * 100 + 1)}%`} stopColor={THERMAL_COLORS.mid} stopOpacity={0.4} />
+                    <stop offset="100%" stopColor={THERMAL_COLORS.high} stopOpacity={0.5} />
                   </linearGradient>
                   
-                  {/* Colorful gradient for future */}
-                  <linearGradient id="futureFill" x1="0" y1="1" x2="0" y2="0">
-                    <stop offset="0%" stopColor={THERMAL_COLORS.low} stopOpacity={0.15} />
-                    <stop offset="25%" stopColor={THERMAL_COLORS.lowMid} stopOpacity={0.3} />
-                    <stop offset="50%" stopColor={THERMAL_COLORS.mid} stopOpacity={0.4} />
-                    <stop offset="75%" stopColor={THERMAL_COLORS.high} stopOpacity={0.5} />
-                    <stop offset="100%" stopColor={THERMAL_COLORS.peak} stopOpacity={0.7} />
-                  </linearGradient>
-
                   {/* Stroke gradient */}
                   <linearGradient id="strokeGrad" x1="0" y1="1" x2="0" y2="0">
                     <stop offset="0%" stopColor={THERMAL_COLORS.lowMid} />
@@ -309,32 +268,18 @@ export function ProductivityCurve({
                     <stop offset="100%" stopColor={THERMAL_COLORS.peak} />
                   </linearGradient>
 
-                  {/* Horizontal split gradient */}
-                  <linearGradient id="splitGradient" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#4A4A52" stopOpacity={0.2} />
-                    <stop offset={`${Math.max(5, (splitIndex / allChartData.length) * 100)}%`} stopColor="#4A4A52" stopOpacity={0.2} />
-                    <stop offset={`${Math.min(95, (splitIndex / allChartData.length) * 100 + 2)}%`} stopColor={THERMAL_COLORS.mid} stopOpacity={0.4} />
-                    <stop offset="100%" stopColor={THERMAL_COLORS.high} stopOpacity={0.5} />
-                  </linearGradient>
-
                   <filter id="glow">
                     <feGaussianBlur stdDeviation="2" result="blur"/>
-                    <feMerge>
-                      <feMergeNode in="blur"/>
-                      <feMergeNode in="SourceGraphic"/>
-                    </feMerge>
+                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
                   </filter>
                 </defs>
 
                 <XAxis 
                   dataKey="displayTime" 
-                  tick={{ 
-                    fontSize: 9, 
-                    fill: "var(--text-muted)",
-                  }}
+                  tick={{ fontSize: 9, fill: "var(--text-muted)" }}
                   tickLine={false}
                   axisLine={false}
-                  interval={5}
+                  interval={4}
                 />
 
                 <YAxis domain={[0, 100]} hide />
@@ -344,12 +289,12 @@ export function ProductivityCurve({
                   <ReferenceArea
                     x1={formatTimeForDisplay(melatoninStart)}
                     x2={formatTimeForDisplay(melatoninEnd)}
-                    fill="rgba(123, 104, 238, 0.1)"
+                    fill="rgba(123, 104, 238, 0.08)"
                     fillOpacity={1}
                   />
                 )}
 
-                {/* Main curve with split coloring - natural for smooth curves */}
+                {/* Main curve */}
                 <Area
                   type="natural"
                   dataKey="value"
@@ -360,12 +305,12 @@ export function ProductivityCurve({
                   filter="url(#glow)"
                 />
 
-                {/* Minimalistic "Now" dot marker */}
+                {/* Now dot marker */}
                 {nowPoint && (
                   <ReferenceDot
                     x={nowPoint.displayTime}
                     y={nowPoint.value}
-                    r={4}
+                    r={5}
                     fill="var(--accent-purple)"
                     stroke="var(--bg-dark)"
                     strokeWidth={2}
@@ -374,18 +319,14 @@ export function ProductivityCurve({
                       position: "top",
                       fill: "var(--text-muted)",
                       fontSize: 9,
-                      dy: -8,
+                      dy: -6,
                     }}
                   />
                 )}
 
                 <Tooltip
                   content={<CustomTooltip />}
-                  cursor={{ 
-                    stroke: "var(--glass-border)", 
-                    strokeWidth: 1,
-                    strokeDasharray: "3 3"
-                  }}
+                  cursor={{ stroke: "var(--glass-border)", strokeWidth: 1, strokeDasharray: "3 3" }}
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -393,43 +334,22 @@ export function ProductivityCurve({
         </div>
       </div>
 
-      {/* "Now" button - appears when scrolled away */}
+      {/* "Now" button */}
       <AnimatePresence>
         {showNowButton && (
           <motion.button
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.15 }}
             onClick={scrollToNow}
-            className="absolute bottom-4 right-2 px-2.5 py-1 rounded-full text-[10px] font-medium
-              bg-[var(--accent-purple)] text-white
-              shadow-lg shadow-[var(--accent-purple)]/20
-              flex items-center gap-1"
+            className="absolute bottom-3 right-2 px-2.5 py-1 rounded-full text-[10px] font-medium
+              bg-[var(--accent-purple)] text-white shadow-lg flex items-center gap-1"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
             Now
           </motion.button>
         )}
       </AnimatePresence>
-
-      {/* Legend */}
-      <div className="flex justify-between items-center text-[10px] mt-2 px-1">
-        <div className="flex items-center gap-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#5A5A62]" />
-          <span className="text-[var(--text-muted)]">Past</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: THERMAL_COLORS.mid }} />
-            <span className="text-[var(--text-muted)]">Moderate</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: THERMAL_COLORS.peak }} />
-            <span className="text-[var(--text-muted)]">Peak</span>
-          </div>
-        </div>
-      </div>
 
       <style jsx>{`
         div::-webkit-scrollbar { display: none; }
