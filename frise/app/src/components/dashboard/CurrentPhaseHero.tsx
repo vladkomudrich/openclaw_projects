@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import { format, parseISO } from "date-fns";
 import { 
   ProductivityPhase, 
@@ -30,6 +30,8 @@ export function CurrentPhaseHero({
   insights, 
   melatoninWindow 
 }: CurrentPhaseHeroProps) {
+  const shouldReduceMotion = useReducedMotion();
+  
   // Determine current phase based on data
   const { currentPhase, config, advice } = useMemo(() => {
     const now = new Date();
@@ -107,7 +109,6 @@ export function CurrentPhaseHero({
     
     // Melatonin window
     if (insights.melatoninWindowStart) {
-      const isPast = isTimePast(insights.melatoninWindowStart, now);
       items.push({
         icon: "🌙",
         label: "Melatonin",
@@ -121,92 +122,149 @@ export function CurrentPhaseHero({
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.4 }}
+      initial={shouldReduceMotion ? {} : { opacity: 0, scale: 0.96, y: 10 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
     >
       <GlassCard 
         padding="lg"
+        variant="layered"
         className="relative overflow-hidden"
         style={{
-          boxShadow: `0 0 40px ${config.glowColor}`,
+          boxShadow: `0 0 50px ${config.glowColor}, 0 8px 32px -8px rgba(0,0,0,0.4)`,
         }}
       >
         {/* Gradient accent line at top */}
-        <div 
-          className="absolute top-0 left-0 right-0 h-1.5 rounded-t-[24px]"
+        <motion.div 
+          className="absolute top-0 left-0 right-0 h-1 rounded-t-[24px]"
           style={{ background: config.gradient }}
+          initial={shouldReduceMotion ? {} : { scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        />
+        
+        {/* Ambient glow effect */}
+        <div 
+          className="absolute -top-20 -right-20 w-40 h-40 rounded-full pointer-events-none"
+          style={{
+            background: `radial-gradient(circle, ${config.glowColor} 0%, transparent 70%)`,
+            filter: "blur(30px)",
+            opacity: 0.5,
+          }}
+          aria-hidden="true"
         />
         
         {/* Main content */}
-        <div className="flex items-start gap-4">
-          {/* Phase icon */}
+        <div className="flex items-start gap-4 relative">
+          {/* Phase icon with breathing animation */}
           <motion.div 
-            className="flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center text-3xl"
+            className="flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center text-3xl relative"
             style={{ background: config.gradient }}
-            animate={{ scale: [1, 1.03, 1] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            animate={shouldReduceMotion ? {} : { 
+              scale: [1, 1.04, 1],
+              filter: ["brightness(1)", "brightness(1.1)", "brightness(1)"]
+            }}
+            transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
           >
-            {config.icon}
+            {/* Inner glow */}
+            <div 
+              className="absolute inset-0 rounded-2xl"
+              style={{
+                background: "radial-gradient(ellipse 80% 60% at 50% 30%, rgba(255,255,255,0.25) 0%, transparent 70%)",
+              }}
+            />
+            <span className="relative z-10">{config.icon}</span>
           </motion.div>
           
           <div className="flex-1 min-w-0">
             {/* Phase name */}
-            <h2 
+            <motion.h2 
               className="font-display font-bold text-xl"
               style={{ 
                 background: config.gradient,
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
+              initial={shouldReduceMotion ? {} : { opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
             >
               {config.name}
-            </h2>
+            </motion.h2>
             
             {/* Advice */}
-            <p className="text-[var(--text-secondary)] text-sm mt-1 leading-relaxed">
+            <motion.p 
+              className="text-[var(--text-secondary)] text-sm mt-1.5 leading-relaxed"
+              initial={shouldReduceMotion ? {} : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
               {advice}
-            </p>
+            </motion.p>
             
             {/* Current productivity indicator */}
-            <div className="flex items-center gap-2 mt-2">
-              <span className="inline-block w-2 h-2 rounded-full bg-[var(--error)] animate-pulse" />
-              <span className="text-xs text-[var(--text-muted)]">
+            <motion.div 
+              className="flex items-center gap-2 mt-3"
+              initial={shouldReduceMotion ? {} : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+            >
+              <motion.span 
+                className="inline-block w-2 h-2 rounded-full bg-[var(--success)]"
+                animate={shouldReduceMotion ? {} : { 
+                  scale: [1, 1.3, 1],
+                  opacity: [1, 0.7, 1] 
+                }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+              <span className="text-xs text-[var(--text-muted)] tracking-wide">
                 {insights.currentProductivity}% energy right now
               </span>
-            </div>
+            </motion.div>
           </div>
         </div>
         
         {/* Schedule list */}
-        {scheduleItems.length > 0 && (
-          <div className="mt-5 pt-4 border-t border-[var(--glass-border)]">
-            <p className="label text-[var(--text-muted)] mb-3">Coming up</p>
-            <div className="flex flex-wrap gap-4">
-              {scheduleItems.map((item, index) => (
-                <motion.div
-                  key={`${item.label}-${index}`}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${
-                    item.isActive 
-                      ? "bg-[var(--accent-purple)]/20 border border-[var(--accent-purple)]/30" 
-                      : "bg-[var(--glass-bg)]"
-                  }`}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <span className="text-base">{item.icon}</span>
-                  <span className="text-sm text-[var(--text-secondary)]">
-                    {item.label}:
-                  </span>
-                  <span className="text-sm font-medium text-[var(--text-primary)]">
-                    {item.time}
-                  </span>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        )}
+        <AnimatePresence>
+          {scheduleItems.length > 0 && (
+            <motion.div 
+              className="mt-5 pt-4 border-t border-[var(--glass-border)]"
+              initial={shouldReduceMotion ? {} : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <p className="label text-[var(--text-muted)] mb-3 tracking-widest">Coming up</p>
+              <div className="flex flex-wrap gap-3">
+                {scheduleItems.map((item, index) => (
+                  <motion.div
+                    key={`${item.label}-${index}`}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-200 ${
+                      item.isActive 
+                        ? "bg-[var(--accent-purple)]/20 border border-[var(--accent-purple)]/40 shadow-[0_0_15px_rgba(123,104,238,0.2)]" 
+                        : "bg-[var(--glass-bg)] border border-transparent hover:border-[var(--glass-border)]"
+                    }`}
+                    initial={shouldReduceMotion ? {} : { opacity: 0, x: -10, scale: 0.9 }}
+                    animate={{ opacity: 1, x: 0, scale: 1 }}
+                    transition={{ 
+                      delay: 0.55 + index * 0.08,
+                      duration: 0.3,
+                      ease: [0.16, 1, 0.3, 1]
+                    }}
+                    whileHover={shouldReduceMotion ? {} : { scale: 1.03 }}
+                  >
+                    <span className="text-base">{item.icon}</span>
+                    <span className="text-sm text-[var(--text-secondary)]">
+                      {item.label}:
+                    </span>
+                    <span className="text-sm font-semibold text-[var(--text-primary)]">
+                      {item.time}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </GlassCard>
     </motion.div>
   );
@@ -234,7 +292,6 @@ function findNextDip(points: ProductivityPoint[], now: Date): string | null {
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   
   let inDip = false;
-  let dipStart: string | null = null;
   
   for (const point of points) {
     const timeStr = point.time.includes("T")

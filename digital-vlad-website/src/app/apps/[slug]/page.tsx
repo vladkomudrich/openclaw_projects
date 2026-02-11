@@ -1,42 +1,15 @@
 import { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Container } from '@/components/ui/container';
-import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
+import { getAppBySlug, apps } from '@/lib/static-data';
 
-interface App {
-  id: string;
-  title: string;
-  slug: string;
-  description: string;
-  iconUrl: string;
-  screenshots: string[];
-  externalLink: string;
-  accentColor: string;
-  category: {
-    id: string;
-    name: string;
-    slug: string;
-  };
-}
-
-async function getApp(slug: string): Promise<App | null> {
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/apps/${slug}`, {
-      next: { revalidate: 300 },
-    });
-
-    if (!response.ok) return null;
-
-    const data = await response.json();
-    return data.data;
-  } catch {
-    return null;
-  }
+export async function generateStaticParams() {
+  return apps.map((app) => ({
+    slug: app.slug,
+  }));
 }
 
 export async function generateMetadata({
@@ -45,7 +18,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const app = await getApp(slug);
+  const app = getAppBySlug(slug);
 
   if (!app) {
     return { title: 'App Not Found' };
@@ -54,21 +27,19 @@ export async function generateMetadata({
   return {
     title: `${app.title} | Digital Vlad`,
     description: app.description,
-    openGraph: {
-      title: app.title,
-      description: app.description,
-      images: app.iconUrl ? [app.iconUrl] : undefined,
-    },
   };
 }
 
 export default async function AppDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const app = await getApp(slug);
+  const app = getAppBySlug(slug);
 
   if (!app) {
     notFound();
   }
+
+  // Placeholder external links
+  const externalLink = `https://${app.slug}.app`;
 
   return (
     <>
@@ -104,20 +75,9 @@ export default async function AppDetailPage({ params }: { params: Promise<{ slug
                 className="w-24 h-24 md:w-32 md:h-32 rounded-3xl overflow-hidden shadow-2xl flex-shrink-0"
                 style={{ backgroundColor: app.accentColor }}
               >
-                {app.iconUrl ? (
-                  <Image
-                    src={app.iconUrl}
-                    alt={app.title}
-                    width={128}
-                    height={128}
-                    className="object-cover w-full h-full"
-                    unoptimized
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-white text-4xl font-bold">
-                    {app.title.charAt(0)}
-                  </div>
-                )}
+                <div className="w-full h-full flex items-center justify-center text-white text-4xl font-bold">
+                  {app.title.charAt(0)}
+                </div>
               </div>
 
               {/* Info */}
@@ -133,14 +93,15 @@ export default async function AppDetailPage({ params }: { params: Promise<{ slug
 
                 <p className="text-foreground-muted text-lg mb-6 max-w-2xl">{app.description}</p>
 
-                <Button
-                  size="lg"
-                  onClick={() => window.open(app.externalLink, '_blank')}
+                <a
+                  href={externalLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-white font-semibold transition-opacity hover:opacity-90"
                   style={{ backgroundColor: app.accentColor }}
-                  className="hover:opacity-90"
                 >
                   Open App
-                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -148,36 +109,20 @@ export default async function AppDetailPage({ params }: { params: Promise<{ slug
                       d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                     />
                   </svg>
-                </Button>
+                </a>
               </div>
             </div>
           </Container>
         </div>
 
-        {/* Screenshots */}
-        {app.screenshots && app.screenshots.length > 0 && (
-          <section className="py-16 bg-background-secondary">
-            <Container>
-              <h2 className="text-2xl font-bold text-foreground mb-8">Screenshots</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {app.screenshots.map((screenshot, index) => (
-                  <div
-                    key={index}
-                    className="relative aspect-video rounded-xl overflow-hidden border border-card-border shadow-lg"
-                  >
-                    <Image
-                      src={screenshot}
-                      alt={`${app.title} screenshot ${index + 1}`}
-                      fill
-                      className="object-cover"
-                      unoptimized
-                    />
-                  </div>
-                ))}
-              </div>
-            </Container>
-          </section>
-        )}
+        {/* Coming Soon section instead of screenshots */}
+        <section className="py-16 bg-background-secondary">
+          <Container>
+            <div className="text-center py-12">
+              <p className="text-foreground-muted text-lg">Screenshots coming soon</p>
+            </div>
+          </Container>
+        </section>
       </main>
       <Footer />
     </>
