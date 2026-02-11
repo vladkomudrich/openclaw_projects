@@ -2,9 +2,9 @@
 
 import { GlassCard } from "@/components/ui/GlassCard";
 import { SleepDebt, SleepEntry } from "@/types";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
-import { differenceInMinutes, parseISO, format } from "date-fns";
+import { differenceInMinutes, parseISO } from "date-fns";
 
 interface CompactSleepWidgetProps {
   sleepEntry: SleepEntry | null;
@@ -12,6 +12,8 @@ interface CompactSleepWidgetProps {
 }
 
 export function CompactSleepWidget({ sleepEntry, sleepDebt }: CompactSleepWidgetProps) {
+  const shouldReduceMotion = useReducedMotion();
+  
   // Calculate sleep duration
   const duration = sleepEntry 
     ? calculateSleepDuration(sleepEntry.bedtime, sleepEntry.wakeTime)
@@ -23,10 +25,11 @@ export function CompactSleepWidget({ sleepEntry, sleepDebt }: CompactSleepWidget
   return (
     <Link href="/sleep/edit">
       <motion.div
-        whileTap={{ scale: 0.98 }}
-        initial={{ opacity: 0, y: 10 }}
+        whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+        whileHover={shouldReduceMotion ? {} : { scale: 1.01 }}
+        initial={shouldReduceMotion ? {} : { opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       >
         <GlassCard 
           padding="md" 
@@ -35,20 +38,34 @@ export function CompactSleepWidget({ sleepEntry, sleepDebt }: CompactSleepWidget
         >
           {/* Sleep duration - compact display */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[var(--glass-bg)] flex items-center justify-center">
+            <motion.div 
+              className="w-11 h-11 rounded-xl bg-gradient-to-br from-[var(--accent-purple)]/20 to-[var(--accent-blue)]/20 flex items-center justify-center"
+              whileHover={shouldReduceMotion ? {} : { rotate: 5 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            >
               <span className="text-xl">🛏️</span>
-            </div>
+            </motion.div>
             
             <div>
-              <p className="label text-[var(--text-muted)] mb-0.5">Last night</p>
+              <p className="label text-[var(--text-muted)] mb-0.5 tracking-wider">Last night</p>
               <div className="flex items-baseline gap-1">
-                <span className="font-display font-bold text-lg text-[var(--text-primary)]">
+                <motion.span 
+                  className="font-display font-bold text-lg text-[var(--text-primary)]"
+                  initial={shouldReduceMotion ? {} : { opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.1 }}
+                >
                   {duration.hours}h
-                </span>
+                </motion.span>
                 {duration.minutes > 0 && (
-                  <span className="font-display font-bold text-lg text-[var(--text-primary)]">
+                  <motion.span 
+                    className="font-display font-bold text-lg text-[var(--text-primary)]"
+                    initial={shouldReduceMotion ? {} : { opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.15 }}
+                  >
                     {duration.minutes}m
-                  </span>
+                  </motion.span>
                 )}
               </div>
             </div>
@@ -56,19 +73,27 @@ export function CompactSleepWidget({ sleepEntry, sleepDebt }: CompactSleepWidget
           
           {/* Sleep debt badge */}
           <div className="flex items-center gap-3">
-            <div 
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
+            <motion.div 
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide"
               style={{
                 backgroundColor: debtConfig.bgColor,
                 color: debtConfig.textColor,
+                boxShadow: `0 0 12px ${debtConfig.bgColor}`,
               }}
+              initial={shouldReduceMotion ? {} : { opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
             >
               <span>{debtConfig.icon}</span>
               <span>{debtConfig.label}</span>
-            </div>
+            </motion.div>
             
             {/* Edit indicator */}
-            <div className="text-[var(--text-muted)]">
+            <motion.div 
+              className="text-[var(--text-muted)]"
+              animate={shouldReduceMotion ? {} : { x: [0, 3, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
+            >
               <svg 
                 className="w-4 h-4" 
                 fill="none" 
@@ -82,7 +107,7 @@ export function CompactSleepWidget({ sleepEntry, sleepDebt }: CompactSleepWidget
                   d="M9 5l7 7-7 7" 
                 />
               </svg>
-            </div>
+            </motion.div>
           </div>
         </GlassCard>
       </motion.div>
@@ -122,7 +147,7 @@ function getDebtConfig(sleepDebt: SleepDebt): {
     return {
       icon: "✓",
       label: `+${debtHours}h`,
-      bgColor: "rgba(34, 197, 94, 0.15)",
+      bgColor: "rgba(74, 222, 128, 0.15)",
       textColor: "var(--success)",
     };
   }
@@ -141,7 +166,7 @@ function getDebtConfig(sleepDebt: SleepDebt): {
     return {
       icon: "−",
       label: `${debtHours}h debt`,
-      bgColor: "rgba(245, 158, 11, 0.15)",
+      bgColor: "rgba(251, 191, 36, 0.15)",
       textColor: "var(--warning)",
     };
   }
@@ -149,7 +174,7 @@ function getDebtConfig(sleepDebt: SleepDebt): {
   return {
     icon: "⚠",
     label: `${debtHours}h debt`,
-    bgColor: "rgba(239, 68, 68, 0.15)",
+    bgColor: "rgba(248, 113, 113, 0.15)",
     textColor: "var(--error)",
   };
 }
