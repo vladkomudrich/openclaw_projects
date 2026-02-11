@@ -122,7 +122,6 @@ export function Dashboard({ curve, onLogSleep }: DashboardProps) {
             wakeTime={wakeTime}
             melatoninWindow={melatoninWindow}
             showAnimation={true}
-            focusedMode={true}
           />
         </GlassCard>
       </motion.div>
