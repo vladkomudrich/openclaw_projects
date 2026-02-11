@@ -1,0 +1,940 @@
+{
+  "project": {
+    "name": "Frise",
+    "description": "Sleep-powered productivity forecast - A free, web-based PWA that predicts daily productivity peaks and valleys based on user sleep patterns using the Two-Process Model",
+    "techStack": [
+      "Next.js 14+",
+      "Hero UI v2",
+      "Tailwind CSS",
+      "localStorage",
+      "Recharts",
+      "date-fns",
+      "next-pwa"
+    ],
+    "startDate": "2026-02-06",
+    "status": "completed",
+    "completedDate": "2026-02-06"
+  },
+  "phases": [
+    {
+      "id": "phase-0",
+      "name": "Setup & Foundation",
+      "completionPromise": "PHASE_0_COMPLETE",
+      "verificationChecklist": [
+        "Next.js 14+ project initializes successfully",
+        "Hero UI components render correctly",
+        "Tailwind CSS styling works",
+        "PWA manifest configured",
+        "Design tokens implemented",
+        "All base UI components functional"
+      ],
+      "tasks": [
+        {
+          "id": "task-0.1",
+          "title": "Initialize Next.js 14+ with App Router",
+          "description": "Create Next.js project with TypeScript, configure for App Router",
+          "acceptanceCriteria": [
+            "Next.js 14+ project created with TypeScript",
+            "App Router structure (/app directory)",
+            "Project runs with npm run dev",
+            "ESLint configured"
+          ],
+          "testRequirements": [
+            "Project starts without errors"
+          ],
+          "dependencies": [],
+          "status": "completed"
+        },
+        {
+          "id": "task-0.2",
+          "title": "Install Hero UI v2 and Tailwind CSS",
+          "description": "Set up Hero UI with Tailwind CSS, configure theme",
+          "acceptanceCriteria": [
+            "Hero UI provider configured in layout",
+            "Tailwind CSS working with Hero UI",
+            "Custom color palette from spec configured",
+            "Inter font configured"
+          ],
+          "testRequirements": [
+            "Hero UI button renders correctly"
+          ],
+          "dependencies": [
+            "task-0.1"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-0.3",
+          "title": "Create design tokens and theme",
+          "description": "Implement color palette, typography, spacing from spec",
+          "acceptanceCriteria": [
+            "Brand colors defined (soft purple, lavender, thermal gradient)",
+            "Typography scale implemented",
+            "Spacing system configured",
+            "Neutral palette applied"
+          ],
+          "testRequirements": [
+            "Theme variables accessible in components"
+          ],
+          "dependencies": [
+            "task-0.2"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-0.4",
+          "title": "Build reusable UI components",
+          "description": "Create Button, Card, Modal, Tooltip components with Hero UI",
+          "acceptanceCriteria": [
+            "Button variants (primary, secondary, ghost)",
+            "Card component with proper styling",
+            "Modal/overlay component",
+            "Tooltip component",
+            "All components use design tokens"
+          ],
+          "testRequirements": [
+            "Each component renders without errors"
+          ],
+          "dependencies": [
+            "task-0.3"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-0.5",
+          "title": "Configure PWA with next-pwa",
+          "description": "Set up PWA configuration, manifest, service worker",
+          "acceptanceCriteria": [
+            "next-pwa installed and configured",
+            "manifest.json with app icons",
+            "Service worker generated",
+            "Offline fallback page"
+          ],
+          "testRequirements": [
+            "PWA installable in browser"
+          ],
+          "dependencies": [
+            "task-0.1"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-0.6",
+          "title": "Set up project structure",
+          "description": "Create folder structure for components, hooks, lib, types",
+          "acceptanceCriteria": [
+            "/components directory with subdirs (dashboard, onboarding, sleep, ui, visualization)",
+            "/hooks directory",
+            "/lib directory with subdirs (calculations, storage, constants)",
+            "/types directory",
+            "Path aliases configured (@/)"
+          ],
+          "testRequirements": [
+            "Import aliases work correctly"
+          ],
+          "dependencies": [
+            "task-0.1"
+          ],
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "id": "phase-1",
+      "name": "Core Sleep Calculations",
+      "completionPromise": "PHASE_1_COMPLETE",
+      "verificationChecklist": [
+        "Two-Process Model calculations accurate",
+        "All calculation functions have unit tests",
+        "localStorage service works correctly",
+        "TypeScript types defined for all data models"
+      ],
+      "tasks": [
+        {
+          "id": "task-1.1",
+          "title": "Define TypeScript interfaces",
+          "description": "Create types for SleepEntry, ProductivityPoint, UserSettings, SleepDebt",
+          "acceptanceCriteria": [
+            "SleepEntry interface with date, bedtime, wakeTime, duration",
+            "ProductivityPoint interface for curve data",
+            "UserSettings interface",
+            "SleepDebt interface",
+            "All types exported from /types"
+          ],
+          "testRequirements": [
+            "Types compile without errors"
+          ],
+          "dependencies": [
+            "task-0.6"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-1.2",
+          "title": "Implement Two-Process Model calculations",
+          "description": "Create Process S (sleep pressure) and Process C (circadian) calculations",
+          "acceptanceCriteria": [
+            "calculateProcessS function (sleep homeostasis)",
+            "calculateProcessC function (circadian rhythm)",
+            "Combined productivity formula implementation",
+            "Functions handle timezone correctly"
+          ],
+          "testRequirements": [
+            "Unit tests for Process S with various sleep durations",
+            "Unit tests for Process C at different times",
+            "Integration test for combined formula"
+          ],
+          "dependencies": [
+            "task-1.1"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-1.3",
+          "title": "Create productivity curve generator",
+          "description": "Implement calculateProductivityCurve function with 5-minute granularity",
+          "acceptanceCriteria": [
+            "Returns array of ProductivityPoints for 5 AM - 1 AM",
+            "5-minute interval granularity",
+            "Productivity values 0-100 normalized",
+            "Handles various sleep patterns"
+          ],
+          "testRequirements": [
+            "Test with typical 11pm-7am sleep",
+            "Test with short sleep (5 hours)",
+            "Test with late sleep (2am-10am)"
+          ],
+          "dependencies": [
+            "task-1.2"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-1.4",
+          "title": "Create supporting calculation functions",
+          "description": "Implement melatonin window, optimal bedtime, sleep debt calculations",
+          "acceptanceCriteria": [
+            "calculateMelatoninWindow returns start/end times",
+            "calculateOptimalBedtime based on melatonin window",
+            "calculateSleepDebt with 14-day history support",
+            "Functions return sensible defaults"
+          ],
+          "testRequirements": [
+            "Test melatonin window calculation",
+            "Test optimal bedtime calculation",
+            "Test sleep debt with varying history"
+          ],
+          "dependencies": [
+            "task-1.2"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-1.5",
+          "title": "Create localStorage service",
+          "description": "Implement data persistence with 14-day rolling window",
+          "acceptanceCriteria": [
+            "saveSleepEntry function",
+            "getSleepEntries function (returns sorted array)",
+            "saveSettings/getSettings functions",
+            "14-day automatic cleanup",
+            "Data validation on load",
+            "Export/import JSON functions"
+          ],
+          "testRequirements": [
+            "Test save/load cycle",
+            "Test 14-day cleanup",
+            "Test export/import"
+          ],
+          "dependencies": [
+            "task-1.1"
+          ],
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "name": "Onboarding & Sleep Input",
+      "completionPromise": "PHASE_2_COMPLETE",
+      "verificationChecklist": [
+        "Welcome screen displays correctly",
+        "Sleep input slider and time pickers work",
+        "First sleep entry saves and shows curve",
+        "Progressive onboarding prompts appear",
+        "Full flow completes in <60 seconds"
+      ],
+      "tasks": [
+        {
+          "id": "task-2.1",
+          "title": "Build welcome screen",
+          "description": "Create onboarding welcome page with value proposition",
+          "acceptanceCriteria": [
+            "Headline: 'Discover when you'll be at your best today'",
+            "Subheadline with value proposition",
+            "Calming visual/illustration placeholder",
+            "CTA button: 'Enter last night's sleep'",
+            "Zen aesthetic from design spec"
+          ],
+          "testRequirements": [
+            "Page renders, CTA navigates correctly"
+          ],
+          "dependencies": [
+            "task-0.4"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-2.2",
+          "title": "Create dual-handle range slider component",
+          "description": "Build time range slider for bedtime/wake selection",
+          "acceptanceCriteria": [
+            "Two handles for bedtime and wake time",
+            "Visual time labels on slider",
+            "Real-time duration display ('7h 30m')",
+            "Touch-friendly on mobile (44px targets)",
+            "Handles day boundary (e.g., 11pm to 7am)"
+          ],
+          "testRequirements": [
+            "Slider values update correctly",
+            "Duration calculates properly across midnight"
+          ],
+          "dependencies": [
+            "task-0.4"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-2.3",
+          "title": "Create wheel time picker component",
+          "description": "Build dual wheel pickers for precise time input",
+          "acceptanceCriteria": [
+            "Side-by-side bedtime and wake time pickers",
+            "Syncs with range slider above",
+            "12-hour format with AM/PM",
+            "Smooth scroll/wheel interaction"
+          ],
+          "testRequirements": [
+            "Time picker values sync with slider"
+          ],
+          "dependencies": [
+            "task-2.2"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-2.4",
+          "title": "Build sleep input page",
+          "description": "Combine components into complete sleep entry flow",
+          "acceptanceCriteria": [
+            "Slider and time pickers on same page",
+            "Validation for unusual durations",
+            "Confirmation showing calculated times",
+            "Submit saves to localStorage",
+            "Navigates to dashboard after submit"
+          ],
+          "testRequirements": [
+            "Full flow from input to save works",
+            "Validation shows for <3h or >14h sleep"
+          ],
+          "dependencies": [
+            "task-2.2",
+            "task-2.3",
+            "task-1.5"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-2.5",
+          "title": "Implement progressive onboarding prompts",
+          "description": "Create timed prompts for ideal sleep duration and notifications",
+          "acceptanceCriteria": [
+            "After 10-15s on dashboard, prompt for ideal sleep duration",
+            "Dismissible modal/slide-in",
+            "Notification permission request (optional)",
+            "Settings saved to localStorage"
+          ],
+          "testRequirements": [
+            "Prompts appear after delay, save settings correctly"
+          ],
+          "dependencies": [
+            "task-2.4",
+            "task-1.5"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-2.6",
+          "title": "Create interactive tutorial overlay",
+          "description": "Build 5-step guided tutorial for first-time users",
+          "acceptanceCriteria": [
+            "5 tutorial steps with highlights",
+            "Step 1: Productivity forecast explanation",
+            "Step 2: Thermal gradient explanation",
+            "Step 3: Tap interaction hint",
+            "Step 4: Purple melatonin zone",
+            "Step 5: Daily return CTA",
+            "Skippable, shows only once"
+          ],
+          "testRequirements": [
+            "Tutorial completes, doesn't show again"
+          ],
+          "dependencies": [
+            "task-3.1"
+          ],
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "name": "Dashboard & Visualization",
+      "completionPromise": "PHASE_3_COMPLETE",
+      "verificationChecklist": [
+        "Productivity curve renders with thermal gradient",
+        "Current time indicator shows and pulses",
+        "Tooltips work on hover/tap",
+        "Melatonin window displays correctly",
+        "Key insights panel shows accurate data",
+        "Sleep debt widget functions",
+        "Contextual advice rotates"
+      ],
+      "tasks": [
+        {
+          "id": "task-3.1",
+          "title": "Build productivity curve visualization",
+          "description": "Create SVG/Recharts curve with thermal gradient coloring",
+          "acceptanceCriteria": [
+            "Smooth curve from 5 AM to 1 AM",
+            "Thermal gradient: blue \u2192 cyan \u2192 yellow \u2192 orange \u2192 red",
+            "Draw-in animation on load (1s left-to-right)",
+            "Responsive sizing",
+            "Pre-wake hours grayed out"
+          ],
+          "testRequirements": [
+            "Curve renders with mock data",
+            "Animation completes smoothly"
+          ],
+          "dependencies": [
+            "task-1.3"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-3.2",
+          "title": "Add current time indicator",
+          "description": "Implement vertical line with 'NOW' label and pulse animation",
+          "acceptanceCriteria": [
+            "Vertical line at current time position",
+            "Label showing 'NOW 2:35 PM' format",
+            "Subtle pulse animation (1.5s interval)",
+            "Bright accent color for visibility"
+          ],
+          "testRequirements": [
+            "Indicator positions correctly at various times"
+          ],
+          "dependencies": [
+            "task-3.1"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-3.3",
+          "title": "Implement interactive tooltips",
+          "description": "Add hover/tap tooltips showing time, productivity %, zone",
+          "acceptanceCriteria": [
+            "Tooltip shows on hover (desktop) and tap (mobile)",
+            "Displays: time, productivity %, zone label",
+            "Context-aware mini-advice",
+            "Fade + translate animation (150ms)"
+          ],
+          "testRequirements": [
+            "Tooltip displays correct data for curve point"
+          ],
+          "dependencies": [
+            "task-3.1"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-3.4",
+          "title": "Add melatonin window overlay",
+          "description": "Create semi-transparent purple overlay for melatonin window",
+          "acceptanceCriteria": [
+            "Purple overlay on curve during melatonin window",
+            "Label: 'Melatonin Window' with \ud83c\udf19 icon",
+            "Positioned based on calculation",
+            "Subtle, doesn't obscure curve"
+          ],
+          "testRequirements": [
+            "Overlay positions match calculated window"
+          ],
+          "dependencies": [
+            "task-3.1",
+            "task-1.4"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-3.5",
+          "title": "Build key insights panel",
+          "description": "Create panel showing best deep work time, melatonin start, bedtime",
+          "acceptanceCriteria": [
+            "\ud83c\udfaf Best time for deep work display",
+            "\ud83c\udf19 Melatonin window starts time",
+            "\ud83d\udecf\ufe0f Optimal bedtime tonight",
+            "Clean card layout with icons"
+          ],
+          "testRequirements": [
+            "Insights update when sleep data changes"
+          ],
+          "dependencies": [
+            "task-1.3",
+            "task-1.4"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-3.6",
+          "title": "Create sleep debt widget",
+          "description": "Build widget showing sleep balance relative to ideal",
+          "acceptanceCriteria": [
+            "Shows hours above/below ideal",
+            "Visual indicator (progress bar or +/- display)",
+            "Color coding: red for debt, green for surplus",
+            "Clear labels with examples from spec"
+          ],
+          "testRequirements": [
+            "Widget calculates and displays debt correctly"
+          ],
+          "dependencies": [
+            "task-1.4",
+            "task-1.5"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-3.7",
+          "title": "Implement contextual advice system",
+          "description": "Create rotating advice based on current time position in curve",
+          "acceptanceCriteria": [
+            "5 variations per zone (Peak, Dip, Wind Down, etc.)",
+            "Advice rotates randomly",
+            "Changes as day progresses",
+            "Calm, encouraging tone"
+          ],
+          "testRequirements": [
+            "Correct advice shown for each zone"
+          ],
+          "dependencies": [
+            "task-3.1"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-3.8",
+          "title": "Compose full dashboard layout",
+          "description": "Integrate all components into responsive dashboard",
+          "acceptanceCriteria": [
+            "Hero section with curve",
+            "Insights panel below curve",
+            "Sleep debt widget",
+            "Advice section",
+            "Responsive: mobile single-column, desktop optimal layout",
+            "Loading states",
+            "Empty state for no data"
+          ],
+          "testRequirements": [
+            "Dashboard renders at mobile breakpoint",
+            "Dashboard renders at desktop breakpoint",
+            "Empty state shows when no data"
+          ],
+          "dependencies": [
+            "task-3.1",
+            "task-3.5",
+            "task-3.6",
+            "task-3.7"
+          ],
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "name": "Daily Usage Features",
+      "completionPromise": "PHASE_4_COMPLETE",
+      "verificationChecklist": [
+        "Morning prompt shows when no data logged",
+        "Historical entries editable",
+        "Missing data warnings display",
+        "Settings page functional",
+        "Data export/import works"
+      ],
+      "tasks": [
+        {
+          "id": "task-4.1",
+          "title": "Implement morning prompt and empty state",
+          "description": "Create prompt for logging sleep when none entered today",
+          "acceptanceCriteria": [
+            "Dashboard shows prompt when today not logged",
+            "Grayed-out placeholder curve",
+            "Clear CTA: 'Log today's sleep to see your forecast'",
+            "Timezone-aware morning detection"
+          ],
+          "testRequirements": [
+            "Prompt shows only when today not logged"
+          ],
+          "dependencies": [
+            "task-3.8"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-4.2",
+          "title": "Build notification permission flow",
+          "description": "Implement browser push notification request and scheduling",
+          "acceptanceCriteria": [
+            "Permission request UI",
+            "Morning reminder scheduling",
+            "Notification click opens app",
+            "Graceful fallback if denied"
+          ],
+          "testRequirements": [
+            "Permission flow completes without errors"
+          ],
+          "dependencies": [
+            "task-2.5"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-4.3",
+          "title": "Create historical data view",
+          "description": "Build list view of past sleep entries with edit capability",
+          "acceptanceCriteria": [
+            "List of last 14 days entries",
+            "Each entry shows date, times, duration",
+            "Tap to edit any entry",
+            "Delete entry option"
+          ],
+          "testRequirements": [
+            "List renders all entries",
+            "Edit saves changes correctly"
+          ],
+          "dependencies": [
+            "task-1.5"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-4.4",
+          "title": "Handle missing data gaps",
+          "description": "Show warnings and quick-fill for skipped days",
+          "acceptanceCriteria": [
+            "Yellow info banner for missing days",
+            "Tappable to quick-fill missing day",
+            "Non-blocking, dismissible",
+            "Current day still shows forecast"
+          ],
+          "testRequirements": [
+            "Banner shows for gaps, dismisses correctly"
+          ],
+          "dependencies": [
+            "task-4.3"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-4.5",
+          "title": "Build settings page",
+          "description": "Create settings interface with all user preferences",
+          "acceptanceCriteria": [
+            "Ideal sleep duration picker",
+            "Notification toggle",
+            "Export data button",
+            "Import data button",
+            "About section with version"
+          ],
+          "testRequirements": [
+            "Settings save correctly",
+            "Export downloads file",
+            "Import restores data"
+          ],
+          "dependencies": [
+            "task-1.5"
+          ],
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "id": "phase-5",
+      "name": "Content & Polish",
+      "completionPromise": "PHASE_5_COMPLETE",
+      "verificationChecklist": [
+        "Learn section has educational content",
+        "Blog pages render with SEO",
+        "PWA fully configured and installable",
+        "All animations smooth",
+        "Accessibility audit passed"
+      ],
+      "tasks": [
+        {
+          "id": "task-5.1",
+          "title": "Write Learn section content",
+          "description": "Create educational articles about sleep science",
+          "acceptanceCriteria": [
+            "How circadian rhythms work article",
+            "Two-Process Model overview",
+            "Why sleep timing matters",
+            "Understanding chronotypes",
+            "Sleep consistency tips"
+          ],
+          "testRequirements": [
+            "All articles render correctly"
+          ],
+          "dependencies": [
+            "task-0.4"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-5.2",
+          "title": "Build learn page layout",
+          "description": "Create article layout with navigation",
+          "acceptanceCriteria": [
+            "Article list/index page",
+            "Individual article page layout",
+            "Simple navigation between articles",
+            "Illustrations/diagrams placeholders"
+          ],
+          "testRequirements": [
+            "Navigation works between articles"
+          ],
+          "dependencies": [
+            "task-5.1"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-5.3",
+          "title": "Set up blog with SEO",
+          "description": "Create blog structure with initial posts",
+          "acceptanceCriteria": [
+            "Blog index page at /blog",
+            "Individual post pages",
+            "Meta tags and Open Graph configured",
+            "3-5 initial SEO articles"
+          ],
+          "testRequirements": [
+            "SEO meta tags present in HTML"
+          ],
+          "dependencies": [
+            "task-0.1"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-5.4",
+          "title": "Finalize PWA configuration",
+          "description": "Complete PWA setup with icons and splash screens",
+          "acceptanceCriteria": [
+            "App icons at all required sizes",
+            "Splash screens configured",
+            "Install prompt handling",
+            "Offline fallback functional"
+          ],
+          "testRequirements": [
+            "Lighthouse PWA audit passes",
+            "Install works on mobile Chrome"
+          ],
+          "dependencies": [
+            "task-0.5"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-5.5",
+          "title": "Polish animations and transitions",
+          "description": "Refine all animations for smoothness",
+          "acceptanceCriteria": [
+            "Curve draw-in animation polished",
+            "Page transitions smooth",
+            "Button hover states refined",
+            "prefers-reduced-motion respected"
+          ],
+          "testRequirements": [
+            "Animations work and can be disabled"
+          ],
+          "dependencies": [
+            "task-3.8"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-5.6",
+          "title": "Accessibility audit and fixes",
+          "description": "Ensure WCAG AA compliance",
+          "acceptanceCriteria": [
+            "Color contrast verified (4.5:1 body, 3:1 large)",
+            "Keyboard navigation complete",
+            "ARIA labels on interactive elements",
+            "Screen reader table for curve data",
+            "Focus indicators visible"
+          ],
+          "testRequirements": [
+            "Lighthouse accessibility score >90"
+          ],
+          "dependencies": [
+            "task-3.8"
+          ],
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "id": "phase-6",
+      "name": "Testing & Optimization",
+      "completionPromise": "PHASE_6_COMPLETE",
+      "verificationChecklist": [
+        "All unit tests pass",
+        "Manual testing complete on all target browsers",
+        "Lighthouse scores >90 all categories",
+        "Bundle size <200KB gzipped",
+        "No critical bugs remaining"
+      ],
+      "tasks": [
+        {
+          "id": "task-6.1",
+          "title": "Cross-browser testing",
+          "description": "Manual testing on iOS Safari, Android Chrome, desktop browsers",
+          "acceptanceCriteria": [
+            "iOS Safari: all features work",
+            "Android Chrome: all features work",
+            "Desktop Chrome: all features work",
+            "Desktop Firefox: all features work",
+            "Desktop Safari: all features work"
+          ],
+          "testRequirements": [
+            "Test report documenting all browsers"
+          ],
+          "dependencies": [
+            "task-5.6"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-6.2",
+          "title": "Performance optimization",
+          "description": "Optimize bundle size, FCP, TTI",
+          "acceptanceCriteria": [
+            "Lighthouse performance >90",
+            "FCP <1.5s",
+            "TTI <3s",
+            "Bundle size <200KB gzipped",
+            "Code splitting implemented"
+          ],
+          "testRequirements": [
+            "Lighthouse report saved"
+          ],
+          "dependencies": [
+            "task-5.6"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-6.3",
+          "title": "Bug fixes and refinements",
+          "description": "Address all issues found in testing",
+          "acceptanceCriteria": [
+            "All critical bugs fixed",
+            "UI/UX refinements applied",
+            "Edge cases handled",
+            "Animation smoothness verified"
+          ],
+          "testRequirements": [
+            "Bug tracking list shows all resolved"
+          ],
+          "dependencies": [
+            "task-6.1",
+            "task-6.2"
+          ],
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "id": "phase-7",
+      "name": "Launch Preparation",
+      "completionPromise": "PROJECT_COMPLETE",
+      "verificationChecklist": [
+        "Privacy policy page exists",
+        "Error logging configured",
+        "Production build succeeds",
+        "Deployment ready"
+      ],
+      "tasks": [
+        {
+          "id": "task-7.1",
+          "title": "Create legal pages",
+          "description": "Add privacy policy and terms pages",
+          "acceptanceCriteria": [
+            "Privacy policy page at /privacy",
+            "Explains local storage usage",
+            "No data collection disclaimer",
+            "Contact information"
+          ],
+          "testRequirements": [
+            "Pages render correctly"
+          ],
+          "dependencies": [],
+          "status": "completed"
+        },
+        {
+          "id": "task-7.2",
+          "title": "Set up error logging",
+          "description": "Configure error tracking for production",
+          "acceptanceCriteria": [
+            "Error boundary component",
+            "Console error logging",
+            "Graceful error states",
+            "Ready for Sentry integration (optional)"
+          ],
+          "testRequirements": [
+            "Error boundary catches and displays errors"
+          ],
+          "dependencies": [
+            "task-3.8"
+          ],
+          "status": "completed"
+        },
+        {
+          "id": "task-7.3",
+          "title": "Production build and deployment config",
+          "description": "Ensure production build works, configure for Vercel",
+          "acceptanceCriteria": [
+            "npm run build succeeds",
+            "vercel.json configured (if needed)",
+            "Environment variables documented",
+            "README with deployment instructions"
+          ],
+          "testRequirements": [
+            "Production build completes without errors"
+          ],
+          "dependencies": [
+            "task-6.3"
+          ],
+          "status": "completed"
+        }
+      ]
+    }
+  ],
+  "globalAcceptanceCriteria": [
+    "All tests pass",
+    "No TypeScript errors",
+    "No ESLint errors",
+    "Lighthouse scores >90",
+    "PWA installable",
+    "Works offline with cached data"
+  ]
+}

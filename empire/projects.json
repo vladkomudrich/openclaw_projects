@@ -1,0 +1,93 @@
+{
+  "projects": [
+    {
+      "id": "frise",
+      "name": "Frise",
+      "description": "Sleep-productivity tracker calculating energy peaks/dips based on circadian science.",
+      "status": "planning",
+      "phases": [
+        {
+          "name": "Phase 1: MVP - Core Features",
+          "status": "todo",
+          "tasks": [
+            {
+              "id": "frise-p1-t1",
+              "task": "Project Initialization",
+              "description": "Setup Next.js project with Hero UI and basic folder structure.",
+              "acceptance_criteria": [
+                "Next.js project running locally.",
+                "Hero UI installed and configured.",
+                "Basic routing (Home, Dashboard) set up."
+              ],
+              "status": "todo"
+            },
+            {
+              "id": "frise-p1-t2",
+              "task": "Sleep Input Interface",
+              "description": "Create a clean UI for users to input bedtime and wake time.",
+              "acceptance_criteria": [
+                "Bedtime picker working.",
+                "Wake time picker working.",
+                "Input data saved to LocalStorage.",
+                "Validation: wake time cannot be before bedtime."
+              ],
+              "status": "todo"
+            },
+            {
+              "id": "frise-p1-t3",
+              "task": "Productivity Prediction Algorithm",
+              "description": "Implement basic circadian rhythm calculation based on sleep times.",
+              "acceptance_criteria": [
+                "Function takes bedtime/wake time and returns energy levels for the day.",
+                "Identifies peak periods and dips.",
+                "Logic handles edge cases (short sleep, late nights)."
+              ],
+              "status": "todo"
+            },
+            {
+              "id": "frise-p1-t4",
+              "task": "Visualization Dashboard",
+              "description": "Render productivity curves using charts.",
+              "acceptance_criteria": [
+                "Graph shows energy levels over 24 hours.",
+                "Current time highlighted on the chart.",
+                "Peak work periods clearly marked."
+              ],
+              "status": "todo"
+            },
+            {
+              "id": "frise-p1-t5",
+              "task": "Actionable Insights Panel",
+              "description": "Display text-based advice based on the energy graph.",
+              "acceptance_criteria": [
+                "Displays 'Best time for deep work' periods.",
+                "Displays 'Energy dip' warnings.",
+                "Provides one sleep optimization tip based on data."
+              ],
+              "status": "todo"
+            }
+          ]
+        },
+        {
+          "name": "Phase 2: Historical Tracking",
+          "status": "backlog",
+          "tasks": []
+        }
+      ]
+    },
+    {
+      "id": "knowme",
+      "name": "KNOWME",
+      "description": "Relationship quiz app for couples.",
+      "status": "backlog",
+      "phases": []
+    },
+    {
+      "id": "guessme",
+      "name": "GUESSME",
+      "description": "Photo-based game for relationships.",
+      "status": "backlog",
+      "phases": []
+    }
+  ]
+}

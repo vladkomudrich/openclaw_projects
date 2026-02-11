@@ -1,0 +1,239 @@
+{
+  "project": {
+    "name": "Frise - Productivity Forecast Redesign",
+    "description": "Redesign the productivity forecast page to show current phase context and a focused 4h energy timeline instead of 24h",
+    "startDate": "2026-02-11",
+    "status": "pending",
+    "parentPRD": "prd.json"
+  },
+  "phases": [
+    {
+      "id": "phase-forecast-redesign",
+      "name": "Productivity Forecast Page Redesign",
+      "completionPromise": "FORECAST_REDESIGN_COMPLETE",
+      "verificationChecklist": [
+        "Current Phase Hero Block shows phase name + advice",
+        "Compact schedule displays peaks, dips, melatonin times",
+        "Sleep hours moved to compact secondary position",
+        "Energy forecast shows 4h window (2h before, 2h after)",
+        "Past curve is grey, future is colorful",
+        "Scroll works on energy timeline",
+        "Now button appears after scroll",
+        "Now marker is minimalistic with 'We're here' label"
+      ],
+      "tasks": [
+        {
+          "id": "task-fr.1",
+          "title": "Create Phase Advice Mappings",
+          "description": "Define all productivity phases and their human-sounding advice messages. Must NOT sound generic AI.",
+          "acceptanceCriteria": [
+            "Phase types defined: approaching_peak, peak, declining, dip, second_wind, wind_down, melatonin_window, rising",
+            "Each phase has 3-5 short advice variations",
+            "Advice is punchy, direct, no fluff",
+            "TypeScript types exported for phase mapping"
+          ],
+          "testRequirements": [
+            "All phases have advice mappings",
+            "No duplicate messages across phases"
+          ],
+          "dependencies": [],
+          "status": "pending",
+          "phaseAdvice": {
+            "rising": [
+              "Energy climbing. Ease into focus work.",
+              "Morning ramp-up. Don't force it yet.",
+              "Building momentum. Light tasks first."
+            ],
+            "approaching_peak": [
+              "Approaching productivity peak",
+              "Peak incoming. Queue your hardest task.",
+              "Almost there. Get ready for deep work."
+            ],
+            "peak": [
+              "Peak zone. Do the hard thing now.",
+              "You're at max capacity. Use it.",
+              "This is your power hour."
+            ],
+            "declining": [
+              "Coming down. Wrap up deep work.",
+              "Energy fading. Switch to lighter tasks.",
+              "Peak's over. Coast into admin work."
+            ],
+            "dip": [
+              "Energy dip. Take a walk or rest.",
+              "Natural slump. Don't fight it.",
+              "Low point. Perfect for a break."
+            ],
+            "second_wind": [
+              "Second wind kicking in.",
+              "Evening energy boost. Use it wisely.",
+              "Bonus focus time. Don't waste it."
+            ],
+            "wind_down": [
+              "Winding down. Avoid new projects.",
+              "Brain's clocking out. Wrap things up.",
+              "Time to decelerate."
+            ],
+            "melatonin_window": [
+              "Melatonin rising. Head to bed soon.",
+              "Sleep window open. Don't miss it.",
+              "Body's prepping for sleep."
+            ]
+          }
+        },
+        {
+          "id": "task-fr.2",
+          "title": "Build Current Phase Hero Block Component",
+          "description": "Replace the 'Last Night Sleep' hero block with a new component showing current phase and schedule",
+          "acceptanceCriteria": [
+            "Hero shows current phase name prominently",
+            "Short advice displayed under phase name",
+            "Advice rotates between available messages for current phase",
+            "Compact schedule list below showing: next peak, next dip, melatonin window time",
+            "Schedule format: icon + label + time (e.g., '🔺 Peak: 10:30')",
+            "Component is visually the hero/primary element"
+          ],
+          "testRequirements": [
+            "Phase updates correctly based on current time",
+            "Schedule times are accurate to curve data",
+            "Advice does not repeat on refresh (rotates)"
+          ],
+          "dependencies": ["task-fr.1"],
+          "status": "pending"
+        },
+        {
+          "id": "task-fr.3",
+          "title": "Create Compact Sleep Hours Widget",
+          "description": "Move sleep duration info to a smaller, secondary widget below the phase hero",
+          "acceptanceCriteria": [
+            "Sleep hours displayed compactly (e.g., '7h 30m last night')",
+            "Much smaller than current hero block",
+            "Positioned after Phase Hero block",
+            "Tappable to edit sleep entry",
+            "Sleep debt indicator integrated (small badge or inline)"
+          ],
+          "testRequirements": [
+            "Duration displays correctly",
+            "Tap navigates to edit sleep"
+          ],
+          "dependencies": [],
+          "status": "pending"
+        },
+        {
+          "id": "task-fr.4",
+          "title": "Redesign Energy Forecast to 4h Window",
+          "description": "Change the ProductivityCurve from 24h view to a focused 4h window (2h before, 2h after current time)",
+          "acceptanceCriteria": [
+            "Chart shows 4 hour window total",
+            "2 hours before current time visible",
+            "2 hours after current time visible",
+            "Window auto-updates as time passes",
+            "Chart remains smooth and performant"
+          ],
+          "testRequirements": [
+            "Window correctly calculated at different times of day",
+            "Edge cases handled (near wake time, near end of day)"
+          ],
+          "dependencies": [],
+          "status": "pending"
+        },
+        {
+          "id": "task-fr.5",
+          "title": "Implement Grey/Color Split for Past/Future",
+          "description": "Past portion of curve (before now) becomes grey, future portion stays colorful",
+          "acceptanceCriteria": [
+            "All curve data before 'now' marker rendered in grey tones",
+            "Grey portion still shows curve shape/form",
+            "Current time forward uses thermal gradient colors",
+            "Transition at 'now' marker is clean, not jarring",
+            "Gradient definitions updated for split rendering"
+          ],
+          "testRequirements": [
+            "Visual split is clear but not harsh",
+            "Colors accurate on both sides"
+          ],
+          "dependencies": ["task-fr.4"],
+          "status": "pending"
+        },
+        {
+          "id": "task-fr.6",
+          "title": "Add Scroll Capability to Energy Forecast",
+          "description": "Allow horizontal scrolling on the energy forecast to see beyond the 4h window",
+          "acceptanceCriteria": [
+            "User can scroll/swipe horizontally",
+            "Scroll reveals more of the day's curve",
+            "Scroll feels smooth and native",
+            "Initial view centered on current time",
+            "Scroll position persists during session"
+          ],
+          "testRequirements": [
+            "Scroll works on touch and mouse",
+            "No jank or performance issues"
+          ],
+          "dependencies": ["task-fr.4"],
+          "status": "pending"
+        },
+        {
+          "id": "task-fr.7",
+          "title": "Add 'Now' Return Button",
+          "description": "Show a small 'Now' button when user scrolls away from current time position",
+          "acceptanceCriteria": [
+            "Button hidden when chart centered on 'now'",
+            "Button appears when scrolled away (threshold: >30min from center)",
+            "Button labeled 'Now' - small, unobtrusive",
+            "Tap smoothly scrolls back to current time",
+            "Button positioned bottom-right or floating corner"
+          ],
+          "testRequirements": [
+            "Button shows/hides correctly based on scroll position",
+            "Return animation is smooth"
+          ],
+          "dependencies": ["task-fr.6"],
+          "status": "pending"
+        },
+        {
+          "id": "task-fr.8",
+          "title": "Redesign Now Marker",
+          "description": "Make the 'now' marker minimalistic with a small 'We're here' label",
+          "acceptanceCriteria": [
+            "Marker is small, not dominant",
+            "Label reads 'We're here' (not 'NOW' in caps)",
+            "Style: subtle vertical line or dot indicator",
+            "Remove pulsing animation (too attention-grabbing)",
+            "Label positioned unobtrusively near marker"
+          ],
+          "testRequirements": [
+            "Marker visible but not distracting",
+            "Label readable at component scale"
+          ],
+          "dependencies": ["task-fr.4"],
+          "status": "pending"
+        },
+        {
+          "id": "task-fr.9",
+          "title": "Update Dashboard Layout Integration",
+          "description": "Integrate all new components into Dashboard.tsx with proper ordering",
+          "acceptanceCriteria": [
+            "Layout order: Phase Hero → Compact Sleep → Energy Forecast → Insights",
+            "Remove old 'Last Night Sleep' hero card",
+            "Spacing consistent with existing design system",
+            "Animations for new components match existing patterns",
+            "Mobile and desktop responsive"
+          ],
+          "testRequirements": [
+            "Full dashboard renders correctly",
+            "No layout shifts or overflow issues"
+          ],
+          "dependencies": ["task-fr.2", "task-fr.3", "task-fr.5", "task-fr.7", "task-fr.8"],
+          "status": "pending"
+        }
+      ]
+    }
+  ],
+  "globalAcceptanceCriteria": [
+    "All existing tests pass",
+    "No TypeScript errors",
+    "No visual regressions on unchanged components",
+    "Works on mobile and desktop"
+  ]
+}

@@ -1,0 +1,1242 @@
+{
+  "project": {
+    "name": "FuelTime",
+    "description": "Science-based meal timing optimizer for peak performance, energy, and metabolic health",
+    "version": "1.0.0",
+    "startDate": "2026-02-06",
+    "estimatedDuration": "8 weeks",
+    "techStack": ["Next.js 14+", "Hero UI v2", "Tailwind CSS", "TypeScript", "Luxon", "Recharts"],
+    "repository": "projects/fueltime"
+  },
+  "phases": [
+    {
+      "id": "phase-0",
+      "name": "Setup & Research",
+      "completionPromise": "PHASE_0_SETUP_COMPLETE",
+      "estimatedDuration": "1 week",
+      "description": "Project initialization and scientific research foundation",
+      "verificationChecklist": [
+        "Next.js 14+ app running with Hero UI",
+        "Git repository initialized with clear folder structure",
+        "Design system tokens configured",
+        "PWA configuration ready",
+        "Chrononutrition calculation algorithms documented",
+        "TypeScript interfaces for core data models defined"
+      ],
+      "tasks": [
+        {
+          "id": "task-0.1",
+          "title": "Initialize Next.js 14+ project with Hero UI",
+          "description": "Set up the core project structure with modern Next.js App Router and Hero UI v2",
+          "acceptanceCriteria": [
+            "Next.js 14+ project created with App Router",
+            "Hero UI v2 installed and configured",
+            "Tailwind CSS integrated via Hero UI",
+            "TypeScript configured with strict mode",
+            "Development server running successfully",
+            "Basic routing structure in place"
+          ],
+          "testRequirements": [
+            "Development server starts without errors",
+            "TypeScript compilation passes",
+            "Hero UI components render correctly",
+            "Hot reload works properly"
+          ],
+          "dependencies": [],
+          "estimatedHours": 4,
+          "status": "pending"
+        },
+        {
+          "id": "task-0.2", 
+          "title": "Configure project structure and design system",
+          "description": "Set up organized folder structure and design tokens for consistent styling",
+          "acceptanceCriteria": [
+            "Clear folder structure: components/, lib/, types/, styles/",
+            "Design tokens file with FuelTime color palette",
+            "Typography scale configuration",
+            "Spacing system (4px base) in Tailwind config",
+            "Component library foundation",
+            "Import/export patterns established"
+          ],
+          "testRequirements": [
+            "All imports resolve correctly",
+            "Design tokens accessible in components",
+            "Consistent styling patterns work",
+            "Build process includes all necessary files"
+          ],
+          "dependencies": ["task-0.1"],
+          "estimatedHours": 3,
+          "status": "pending"
+        },
+        {
+          "id": "task-0.3",
+          "title": "Set up PWA configuration",
+          "description": "Configure Progressive Web App capabilities with next-pwa",
+          "acceptanceCriteria": [
+            "next-pwa installed and configured",
+            "App manifest.json created with FuelTime branding",
+            "Service worker configuration",
+            "App icons in all required sizes",
+            "Offline capability for core features",
+            "Install prompt functionality"
+          ],
+          "testRequirements": [
+            "PWA installable on mobile devices",
+            "Service worker registers correctly",
+            "Offline functionality works",
+            "App icons display properly",
+            "Lighthouse PWA score >90"
+          ],
+          "dependencies": ["task-0.1"],
+          "estimatedHours": 4,
+          "status": "pending"
+        },
+        {
+          "id": "task-0.4",
+          "title": "Initialize Git repository with proper structure",
+          "description": "Set up version control with organized commit structure",
+          "acceptanceCriteria": [
+            "Git repository initialized",
+            "Proper .gitignore for Next.js project",
+            "README.md with project overview",
+            "Initial commit with project structure",
+            "Development branch created",
+            "Commit message conventions established"
+          ],
+          "testRequirements": [
+            "Repository history is clean",
+            "All necessary files tracked",
+            "No build artifacts in version control",
+            "Branching strategy works"
+          ],
+          "dependencies": ["task-0.2"],
+          "estimatedHours": 1,
+          "status": "pending"
+        },
+        {
+          "id": "task-0.5",
+          "title": "Research and document chrononutrition algorithms",
+          "description": "Compile scientific research and create calculation algorithms",
+          "acceptanceCriteria": [
+            "Scientific research papers compiled",
+            "Chrononutrition calculation algorithms documented", 
+            "Formulas for eating window optimization",
+            "Goal-based timing adjustments logic",
+            "Chronotype modification calculations",
+            "Performance zone timing formulas"
+          ],
+          "testRequirements": [
+            "Algorithm documentation is complete",
+            "Formulas are mathematically sound",
+            "Edge cases identified and handled",
+            "Research citations included"
+          ],
+          "dependencies": [],
+          "estimatedHours": 6,
+          "status": "pending"
+        },
+        {
+          "id": "task-0.6",
+          "title": "Define TypeScript interfaces for data models",
+          "description": "Create type definitions for all core data structures",
+          "acceptanceCriteria": [
+            "UserProfile interface with wake/sleep times, chronotype, goals",
+            "EatingWindow interface with breakfast/lunch/dinner timings",
+            "MealTiming interface for individual meal data",
+            "PerformanceZone interface for cognitive/energy windows", 
+            "MealLog interface for tracking data",
+            "PreferenceSettings interface for user customization"
+          ],
+          "testRequirements": [
+            "TypeScript compilation passes with interfaces",
+            "Interfaces cover all required properties",
+            "Optional and required fields properly defined",
+            "Type safety enforced throughout"
+          ],
+          "dependencies": ["task-0.5"],
+          "estimatedHours": 3,
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "phase-1",
+      "name": "Core Algorithm",
+      "completionPromise": "PHASE_1_ALGORITHM_COMPLETE",
+      "estimatedDuration": "1 week", 
+      "description": "Implement chrononutrition calculation engine and data persistence",
+      "verificationChecklist": [
+        "Eating window calculator produces accurate results",
+        "All goal types (performance, metabolic, energy) working",
+        "Chronotype adjustments functioning correctly",
+        "localStorage persistence working",
+        "Algorithm unit tests passing 100%",
+        "Edge cases handled properly"
+      ],
+      "tasks": [
+        {
+          "id": "task-1.1",
+          "title": "Implement eating window calculation engine",
+          "description": "Core algorithm to calculate optimal eating windows based on user inputs",
+          "acceptanceCriteria": [
+            "Function takes UserProfile input and returns EatingWindow",
+            "Calculates breakfast time within 1-2 hours of wake",
+            "Determines eating window duration based on goal (8-12 hours)",
+            "Ensures dinner is 3+ hours before sleep",
+            "Handles chronotype adjustments (±30 min)",
+            "Returns meal timings with 30-minute flexibility windows"
+          ],
+          "testRequirements": [
+            "Unit tests for all goal types",
+            "Tests for all chronotype variations", 
+            "Edge case tests (very early/late schedules)",
+            "Performance benchmark (calculations <10ms)",
+            "Validation against research parameters"
+          ],
+          "dependencies": ["task-0.6"],
+          "estimatedHours": 8,
+          "status": "pending"
+        },
+        {
+          "id": "task-1.2",
+          "title": "Build performance zone calculator",
+          "description": "Calculate optimal timing for mental clarity, energy, and athletic performance",
+          "acceptanceCriteria": [
+            "Mental clarity zone: 1-3 hours post-breakfast",
+            "Stable energy zones throughout eating window",
+            "Athletic performance: 2 hours before dinner window close",
+            "Cognitive avoidance: post-meal dip periods",
+            "Personalized based on eating window timing",
+            "Returns easy-to-understand time ranges"
+          ],
+          "testRequirements": [
+            "Performance zone calculations tested",
+            "Zone overlaps handled correctly",
+            "Time calculations accurate across timezones",
+            "Integration with eating window calculator"
+          ],
+          "dependencies": ["task-1.1"],
+          "estimatedHours": 5,
+          "status": "pending"
+        },
+        {
+          "id": "task-1.3", 
+          "title": "Create goal-specific optimization logic",
+          "description": "Customize eating windows and recommendations based on user goals",
+          "acceptanceCriteria": [
+            "Metabolic health: 8-hour window, early eating",
+            "Performance: 10-hour balanced window",
+            "Energy stability: consistent timing emphasis",
+            "Athletic performance: protein distribution guidance",
+            "Flexibility: 12-hour window with smart defaults",
+            "Meal spacing recommendations (3-5 hours)"
+          ],
+          "testRequirements": [
+            "Each goal produces different recommendations",
+            "Recommendations align with research",
+            "User can switch goals without errors",
+            "Optimization logic is documented"
+          ],
+          "dependencies": ["task-1.1"],
+          "estimatedHours": 6,
+          "status": "pending"
+        },
+        {
+          "id": "task-1.4",
+          "title": "Implement localStorage data persistence",
+          "description": "Save and retrieve user data locally with export/import functionality",
+          "acceptanceCriteria": [
+            "User profile saved automatically",
+            "Eating window preferences persist",
+            "Meal log history stored (30 days max)",
+            "Settings and customizations saved",
+            "Export data to JSON format",
+            "Import previous data functionality"
+          ],
+          "testRequirements": [
+            "Data persists across browser sessions",
+            "Export produces valid JSON",
+            "Import restores full user state",
+            "Storage quota management works",
+            "Data corruption handling"
+          ],
+          "dependencies": ["task-0.6"],
+          "estimatedHours": 4,
+          "status": "pending"
+        },
+        {
+          "id": "task-1.5",
+          "title": "Build meal timing recommendations engine",
+          "description": "Generate personalized meal timing advice and smart adjustments",
+          "acceptanceCriteria": [
+            "Breakfast timing recommendations based on glucose tolerance",
+            "Lunch timing for sustained energy",
+            "Dinner recommendations for sleep quality",
+            "Snack timing guidance when appropriate",
+            "Carbohydrate timing optimization (front-load)",
+            "Protein distribution throughout eating window"
+          ],
+          "testRequirements": [
+            "Recommendations are science-based",
+            "Timing advice updates with profile changes",
+            "Edge cases produce reasonable recommendations",
+            "Advice is actionable and specific"
+          ],
+          "dependencies": ["task-1.3"],
+          "estimatedHours": 5,
+          "status": "pending"
+        },
+        {
+          "id": "task-1.6",
+          "title": "Comprehensive algorithm testing and validation",
+          "description": "Ensure calculation accuracy and validate against research",
+          "acceptanceCriteria": [
+            "Unit test coverage >95% for calculation functions",
+            "Integration tests for complete workflows",
+            "Performance benchmarks documented",
+            "Research validation checklist completed",
+            "Edge case handling verified",
+            "Error scenarios properly handled"
+          ],
+          "testRequirements": [
+            "All tests pass consistently",
+            "Performance meets benchmarks",
+            "Error handling doesn't break user experience",
+            "Algorithm produces consistent results"
+          ],
+          "dependencies": ["task-1.5"],
+          "estimatedHours": 4,
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "name": "Onboarding & Profile",
+      "completionPromise": "PHASE_2_ONBOARDING_COMPLETE",
+      "estimatedDuration": "1 week",
+      "description": "Create user onboarding experience and profile management",
+      "verificationChecklist": [
+        "Welcome screen engages users effectively",
+        "Onboarding flow is intuitive and quick (<30 seconds to value)",
+        "Time pickers work across all devices",
+        "Profile settings are easily adjustable",
+        "Tutorial overlay is helpful and skippable",
+        "User can see eating window immediately after basic input"
+      ],
+      "tasks": [
+        {
+          "id": "task-2.1",
+          "title": "Design and build welcome screen",
+          "description": "Create compelling first impression with clear value proposition",
+          "acceptanceCriteria": [
+            "Hero headline: 'Eat at the right time, feel amazing all day'",
+            "Subheadline explains science-based meal timing",
+            "Visual design with food/clock iconography", 
+            "Energizing color palette implementation",
+            "Clear CTA: 'Get my eating schedule'",
+            "Mobile-first responsive design"
+          ],
+          "testRequirements": [
+            "Welcome screen loads quickly (<2s)",
+            "Design works on mobile and desktop",
+            "CTA button is prominent and accessible",
+            "Visual hierarchy guides user attention",
+            "Brand identity is consistent"
+          ],
+          "dependencies": ["task-0.2"],
+          "estimatedHours": 6,
+          "status": "pending"
+        },
+        {
+          "id": "task-2.2",
+          "title": "Create progressive onboarding flow",
+          "description": "Step-by-step user input collection with immediate value",
+          "acceptanceCriteria": [
+            "Step 1: Wake/sleep time input (required)",
+            "Step 2: Chronotype selection (optional)",
+            "Step 3: Primary goal selection (optional)",
+            "Step 4: Work schedule input (optional)",
+            "Progress indicator shows completion", 
+            "Skip options for optional steps",
+            "Back navigation available"
+          ],
+          "testRequirements": [
+            "Each step validates input properly",
+            "Skip functionality works correctly",
+            "Progress is saved between steps",
+            "Navigation doesn't lose user data",
+            "Completion triggers algorithm calculation"
+          ],
+          "dependencies": ["task-2.1", "task-1.1"],
+          "estimatedHours": 8,
+          "status": "pending"
+        },
+        {
+          "id": "task-2.3",
+          "title": "Build time picker components",
+          "description": "User-friendly time input controls using Hero UI",
+          "acceptanceCriteria": [
+            "Clean time picker interface",
+            "12-hour and 24-hour format support",
+            "Touch-friendly on mobile devices",
+            "Keyboard navigation support",
+            "Validation for reasonable sleep schedules",
+            "Clear visual feedback for selections"
+          ],
+          "testRequirements": [
+            "Time pickers work on iOS Safari and Android Chrome",
+            "Validation prevents invalid times",
+            "Accessibility standards met (WCAG AA)",
+            "Performance is smooth on low-end devices"
+          ],
+          "dependencies": ["task-0.1"],
+          "estimatedHours": 4,
+          "status": "pending"
+        },
+        {
+          "id": "task-2.4",
+          "title": "Implement instant eating window preview",
+          "description": "Show personalized results immediately after basic input",
+          "acceptanceCriteria": [
+            "Eating window visualization appears after Step 1",
+            "Updates in real-time as user adjusts inputs",
+            "Clear display of breakfast, lunch, dinner windows",
+            "Fasting duration prominently shown",
+            "Visual timeline representation",
+            "Wow moment that demonstrates value"
+          ],
+          "testRequirements": [
+            "Preview updates without page reload",
+            "Calculations are accurate",
+            "Visual representation is clear",
+            "Performance remains smooth during updates"
+          ],
+          "dependencies": ["task-2.2", "task-1.1"],
+          "estimatedHours": 5,
+          "status": "pending"
+        },
+        {
+          "id": "task-2.5",
+          "title": "Create tutorial overlay system",
+          "description": "Quick interactive tutorial for new users",
+          "acceptanceCriteria": [
+            "4-step tutorial (15 seconds total)",
+            "Highlights: eating window, meal zones, timing tips, tracking",
+            "Dismissible at any time",
+            "Skip option clearly available",
+            "Smooth animations between steps",
+            "Never shown again after completion/dismissal"
+          ],
+          "testRequirements": [
+            "Tutorial doesn't interfere with app functionality", 
+            "Animation performance is smooth",
+            "Skip/dismiss preferences are saved",
+            "Works across different screen sizes"
+          ],
+          "dependencies": ["task-2.4"],
+          "estimatedHours": 4,
+          "status": "pending"
+        },
+        {
+          "id": "task-2.6",
+          "title": "Build profile management and settings",
+          "description": "Allow users to adjust their profile and preferences",
+          "acceptanceCriteria": [
+            "Edit wake/sleep times",
+            "Update chronotype selection",
+            "Change primary goal",
+            "Adjust work schedule",
+            "Eating window duration preferences (8/10/12 hours)",
+            "Weekend schedule adjustments",
+            "Data export functionality"
+          ],
+          "testRequirements": [
+            "Profile changes update eating window immediately",
+            "Settings are persisted in localStorage",
+            "Export produces complete user data",
+            "Form validation prevents invalid inputs"
+          ],
+          "dependencies": ["task-1.4"],
+          "estimatedHours": 5,
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "phase-3", 
+      "name": "Dashboard & Timeline",
+      "completionPromise": "PHASE_3_DASHBOARD_COMPLETE",
+      "estimatedDuration": "1 week",
+      "description": "Build main dashboard with timeline visualization and insights",
+      "verificationChecklist": [
+        "24-hour timeline displays user's eating window clearly",
+        "Current time indicator shows where user is in their day",
+        "Performance insights provide actionable guidance",
+        "Interactive zones respond to user touch/click",
+        "Contextual advice updates based on time of day",
+        "Mobile and desktop layouts work seamlessly"
+      ],
+      "tasks": [
+        {
+          "id": "task-3.1",
+          "title": "Build 24-hour timeline visualization component",
+          "description": "Main visual component showing eating/fasting windows",
+          "acceptanceCriteria": [
+            "Horizontal timeline from midnight to midnight",
+            "Sleep zones grayed out (before wake, after sleep)",
+            "Fasting zone with blue gradient",
+            "Eating window with green-orange gradient",
+            "Clear meal markers (breakfast, lunch, dinner)",
+            "Metabolic switch indicator at 12-hour fast mark"
+          ],
+          "testRequirements": [
+            "Timeline renders correctly on all screen sizes",
+            "Visual zones accurately represent user's schedule",
+            "Performance is smooth (60fps animations)",
+            "Color accessibility meets WCAG standards"
+          ],
+          "dependencies": ["task-1.1", "task-0.2"],
+          "estimatedHours": 10,
+          "status": "pending"
+        },
+        {
+          "id": "task-3.2",
+          "title": "Add animated current time indicator",
+          "description": "Real-time indicator showing current position in daily rhythm",
+          "acceptanceCriteria": [
+            "Vertical line showing current time",
+            "Smooth movement as time progresses",
+            "Updates every minute automatically",
+            "Clear label with current time", 
+            "Pulse animation for visual prominence",
+            "Timezone awareness"
+          ],
+          "testRequirements": [
+            "Indicator position is accurate",
+            "Animation doesn't impact performance",
+            "Time updates correctly",
+            "Works across different timezones"
+          ],
+          "dependencies": ["task-3.1"],
+          "estimatedHours": 3,
+          "status": "pending"
+        },
+        {
+          "id": "task-3.3",
+          "title": "Create interactive meal zone tooltips",
+          "description": "Tap/hover information for each meal timing zone",
+          "acceptanceCriteria": [
+            "Breakfast zone: glucose tolerance information",
+            "Lunch zone: energy maintenance guidance", 
+            "Dinner zone: sleep impact advice",
+            "Fasting zone: metabolic benefits explanation",
+            "Touch-friendly on mobile devices",
+            "Dismissible tooltips"
+          ],
+          "testRequirements": [
+            "Tooltips appear on hover/tap",
+            "Content is educational and concise",
+            "Touch interactions work on mobile",
+            "No tooltip overlap issues"
+          ],
+          "dependencies": ["task-3.1"],
+          "estimatedHours": 4,
+          "status": "pending"
+        },
+        {
+          "id": "task-3.4",
+          "title": "Build performance insights cards",
+          "description": "Dashboard cards showing personalized timing guidance",
+          "acceptanceCriteria": [
+            "Mental Performance Zone card with optimal focus times",
+            "Energy Stability card with eating window summary",
+            "Today's Timing Score with visual indicator",
+            "Cards update based on current time and user data",
+            "Clean, scannable design",
+            "Responsive layout for mobile/desktop"
+          ],
+          "testRequirements": [
+            "Insights are accurate and helpful",
+            "Cards layout properly on all screen sizes",
+            "Content updates dynamically",
+            "Visual design is consistent with brand"
+          ],
+          "dependencies": ["task-1.2", "task-0.2"],
+          "estimatedHours": 6,
+          "status": "pending"
+        },
+        {
+          "id": "task-3.5",
+          "title": "Implement contextual advice engine",
+          "description": "Time-aware tips that update based on user's current situation",
+          "acceptanceCriteria": [
+            "Database of 20+ science-backed tips",
+            "Tips rotate based on time of day",
+            "Personalization based on user goals",
+            "Morning: breakfast timing importance",
+            "Midday: energy maintenance advice",
+            "Evening: dinner timing for sleep"
+          ],
+          "testRequirements": [
+            "Advice updates appropriately throughout day",
+            "Tips are relevant to current time",
+            "Content is scientifically accurate",
+            "Rotation prevents repetition"
+          ],
+          "dependencies": ["task-1.5"],
+          "estimatedHours": 4,
+          "status": "pending"
+        },
+        {
+          "id": "task-3.6",
+          "title": "Optimize dashboard responsive design",
+          "description": "Ensure great experience across all device sizes",
+          "acceptanceCriteria": [
+            "Mobile (<640px): Vertical timeline, single-column cards",
+            "Tablet (640-1024px): Horizontal timeline, two-column grid",
+            "Desktop (>1024px): Full timeline, three-column layout",
+            "Touch targets minimum 48x48px on mobile",
+            "Comfortable spacing on all devices"
+          ],
+          "testRequirements": [
+            "Layout works on common device sizes",
+            "Touch interactions are accessible",
+            "Text remains readable at all sizes",
+            "No horizontal scrolling on mobile"
+          ],
+          "dependencies": ["task-3.4"],
+          "estimatedHours": 5,
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "name": "Meal Logging",
+      "completionPromise": "PHASE_4_LOGGING_COMPLETE", 
+      "estimatedDuration": "1 week",
+      "description": "Add meal logging functionality for pattern tracking",
+      "verificationChecklist": [
+        "Quick meal logging takes <5 seconds",
+        "Meal history shows clear patterns",
+        "Timing score calculation is accurate", 
+        "Pattern recognition provides useful insights",
+        "Logged meals update dashboard visualizations",
+        "Edit/delete functionality works smoothly"
+      ],
+      "tasks": [
+        {
+          "id": "task-4.1",
+          "title": "Create floating meal log button",
+          "description": "Quick access button for meal logging",
+          "acceptanceCriteria": [
+            "Circular floating action button",
+            "Bottom-right position on mobile",
+            "Sidebar position on desktop",
+            "Green color with subtle pulse animation",
+            "Utensils or plus icon",
+            "56px diameter with proper touch target"
+          ],
+          "testRequirements": [
+            "Button is easily accessible",
+            "Animation doesn't impact performance",
+            "Positioning works across devices",
+            "Visual design matches brand"
+          ],
+          "dependencies": ["task-0.2"],
+          "estimatedHours": 2,
+          "status": "pending"
+        },
+        {
+          "id": "task-4.2",
+          "title": "Build quick meal logging interface",
+          "description": "Fast meal logging with minimal friction",
+          "acceptanceCriteria": [
+            "Quick log: 'Ate breakfast' with automatic timestamp",
+            "Meal type selector: Breakfast/Lunch/Dinner/Snack",
+            "Custom time picker for non-current logging",
+            "One-tap logging for immediate meals",
+            "Clear confirmation feedback",
+            "Logging takes <5 seconds"
+          ],
+          "testRequirements": [
+            "Logging interface is intuitive",
+            "Timestamps are accurate",
+            "Confirmation feedback is clear",
+            "Works smoothly on mobile touch"
+          ],
+          "dependencies": ["task-4.1", "task-2.3"],
+          "estimatedHours": 5,
+          "status": "pending"
+        },
+        {
+          "id": "task-4.3",
+          "title": "Add optional detailed logging",
+          "description": "Extended logging options for users who want more tracking",
+          "acceptanceCriteria": [
+            "Meal size: Light/Moderate/Hearty",
+            "Dominant macros: Carb-heavy/Balanced/Protein-heavy",
+            "Energy level rating (1-5 scale)",
+            "Optional notes field",
+            "Hunger level before meal", 
+            "All fields optional, quick log always available"
+          ],
+          "testRequirements": [
+            "Detailed logging doesn't slow down quick logging",
+            "Form inputs are user-friendly",
+            "Data is saved properly",
+            "Users can switch between quick and detailed"
+          ],
+          "dependencies": ["task-4.2"],
+          "estimatedHours": 4,
+          "status": "pending"
+        },
+        {
+          "id": "task-4.4",
+          "title": "Create meal history view",
+          "description": "Display logged meals with edit/delete capabilities",
+          "acceptanceCriteria": [
+            "Chronological list of logged meals",
+            "Clear time stamps and meal types",
+            "Edit functionality for corrections",
+            "Delete option with confirmation",
+            "Last 30 days visible by default",
+            "Clean, scannable design"
+          ],
+          "testRequirements": [
+            "History loads quickly",
+            "Edit/delete functions work correctly",
+            "Data updates are immediate",
+            "Design is mobile-friendly"
+          ],
+          "dependencies": ["task-4.3", "task-1.4"],
+          "estimatedHours": 5,
+          "status": "pending"
+        },
+        {
+          "id": "task-4.5",
+          "title": "Implement timing score calculation",
+          "description": "Calculate how well user adheres to optimal timing",
+          "acceptanceCriteria": [
+            "Daily timing score (0-100)",
+            "Breakfast timing alignment score",
+            "Eating window adherence percentage", 
+            "Dinner timing relative to sleep score",
+            "Weekly average calculation",
+            "Visual progress indicator"
+          ],
+          "testRequirements": [
+            "Score calculation is accurate",
+            "Scores update immediately after logging",
+            "Algorithm is fair and motivating",
+            "Visual indicators are clear"
+          ],
+          "dependencies": ["task-4.4", "task-1.1"],
+          "estimatedHours": 6,
+          "status": "pending"
+        },
+        {
+          "id": "task-4.6",
+          "title": "Build basic pattern recognition",
+          "description": "Identify eating patterns and provide insights",
+          "acceptanceCriteria": [
+            "Detect eating window drift over time",
+            "Identify breakfast consistency patterns",
+            "Notice weekend vs weekday differences",
+            "Energy correlation with timing (if logged)",
+            "Simple insights: 'You usually eat breakfast at 8:15 AM'",
+            "Requires 7+ days of data for insights"
+          ],
+          "testRequirements": [
+            "Pattern detection is accurate",
+            "Insights are helpful and actionable",
+            "No insights shown with insufficient data",
+            "Algorithm handles irregular patterns"
+          ],
+          "dependencies": ["task-4.5"],
+          "estimatedHours": 6,
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "phase-5",
+      "name": "Education & Content",
+      "completionPromise": "PHASE_5_CONTENT_COMPLETE",
+      "estimatedDuration": "1 week", 
+      "description": "Create educational content and SEO-optimized blog",
+      "verificationChecklist": [
+        "Learn section has 5+ high-quality articles",
+        "Blog posts are SEO-optimized and discoverable",
+        "Tips library is comprehensive and searchable",
+        "Content explains the science clearly",
+        "Visual diagrams enhance understanding",
+        "All content aligns with FuelTime brand voice"
+      ],
+      "tasks": [
+        {
+          "id": "task-5.1",
+          "title": "Create article templates and navigation",
+          "description": "Foundation for educational content delivery",
+          "acceptanceCriteria": [
+            "Consistent article template design",
+            "Reading time estimation",
+            "Progress indicator for long articles",
+            "Related articles suggestions",
+            "Clean typography for readability",
+            "Mobile-optimized reading experience"
+          ],
+          "testRequirements": [
+            "Articles load quickly",
+            "Reading experience is comfortable", 
+            "Navigation between articles works",
+            "Mobile layout is readable"
+          ],
+          "dependencies": ["task-0.2"],
+          "estimatedHours": 4,
+          "status": "pending"
+        },
+        {
+          "id": "task-5.2",
+          "title": "Write core chrononutrition articles",
+          "description": "Create 5-7 foundational articles explaining the science",
+          "acceptanceCriteria": [
+            "What is chrononutrition? (beginner-friendly)",
+            "Why breakfast timing matters for your brain",
+            "The metabolic switch: what happens during fasting",
+            "Early vs late eating: what the research shows",
+            "Optimizing performance with meal timing",
+            "Your chronotype and optimal eating schedule",
+            "Travel and jet lag eating strategies"
+          ],
+          "testRequirements": [
+            "Articles are scientifically accurate",
+            "Content is accessible to general audience",
+            "Writing aligns with FuelTime voice (concise, evidence-based)",
+            "Each article provides actionable insights"
+          ],
+          "dependencies": ["task-5.1", "task-0.5"],
+          "estimatedHours": 12,
+          "status": "pending"
+        },
+        {
+          "id": "task-5.3",
+          "title": "Create visual diagrams and illustrations",
+          "description": "Visual elements to enhance article comprehension",
+          "acceptanceCriteria": [
+            "Circadian rhythm diagram showing daily cycles",
+            "Glucose tolerance curve throughout the day", 
+            "Eating window comparison charts",
+            "Performance zones visualization",
+            "Metabolic switch timeline",
+            "Consistent visual style with FuelTime brand"
+          ],
+          "testRequirements": [
+            "Diagrams are accurate and educational",
+            "Visual style is consistent",
+            "Images load quickly and are responsive",
+            "Alt text is descriptive for accessibility"
+          ],
+          "dependencies": ["task-5.2"],
+          "estimatedHours": 6,
+          "status": "pending"
+        },
+        {
+          "id": "task-5.4",
+          "title": "Build SEO-optimized blog infrastructure",
+          "description": "Blog setup for organic discovery and growth",
+          "acceptanceCriteria": [
+            "Blog pages with proper meta tags",
+            "OpenGraph tags for social sharing",
+            "Structured data markup",
+            "XML sitemap generation",
+            "Clean URLs and navigation",
+            "Fast page load times"
+          ],
+          "testRequirements": [
+            "SEO best practices implemented",
+            "Social sharing works properly",
+            "Blog is discoverable by search engines",
+            "Page speed scores >90"
+          ],
+          "dependencies": ["task-0.1"],
+          "estimatedHours": 4,
+          "status": "pending"
+        },
+        {
+          "id": "task-5.5", 
+          "title": "Write initial SEO blog posts",
+          "description": "Create 3 blog posts targeting key search terms",
+          "acceptanceCriteria": [
+            "Best Times to Eat for Focus and Energy",
+            "The Science of Meal Timing: A Complete Guide",
+            "Time-Restricted Eating: How to Get Started",
+            "Keyword research and optimization",
+            "Internal linking strategy",
+            "Call-to-action to try FuelTime"
+          ],
+          "testRequirements": [
+            "Content targets relevant keywords",
+            "Posts are comprehensive and valuable",
+            "Internal linking drives to app features",
+            "CTAs are clear and compelling"
+          ],
+          "dependencies": ["task-5.4", "task-5.2"],
+          "estimatedHours": 8,
+          "status": "pending"
+        },
+        {
+          "id": "task-5.6",
+          "title": "Create comprehensive timing tips library",
+          "description": "Searchable database of practical meal timing guidance",
+          "acceptanceCriteria": [
+            "50+ timing tips categorized by meal type and goal",
+            "Search functionality",
+            "Filter by: Breakfast/Lunch/Dinner/Snacks/Pre-workout/Post-workout",
+            "Tips for different chronotypes",
+            "Travel and shift work specific advice",
+            "Easy to scan and implement"
+          ],
+          "testRequirements": [
+            "Search returns relevant results",
+            "Filter functionality works correctly",
+            "Tips are practical and actionable",
+            "Database is easy to navigate"
+          ],
+          "dependencies": ["task-5.1"],
+          "estimatedHours": 6,
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "phase-6", 
+      "name": "Polish & PWA",
+      "completionPromise": "PHASE_6_PWA_COMPLETE",
+      "estimatedDuration": "1 week",
+      "description": "Add animations, notifications, and PWA features",
+      "verificationChecklist": [
+        "PWA installation works on mobile devices",
+        "Push notifications function properly", 
+        "Animations enhance user experience without slowing performance",
+        "App works offline for core features",
+        "Loading states provide good feedback",
+        "Micro-interactions feel polished"
+      ],
+      "tasks": [
+        {
+          "id": "task-6.1",
+          "title": "Design and implement app icons",
+          "description": "Create professional app icons for PWA installation",
+          "acceptanceCriteria": [
+            "App icons in all required sizes (192x192, 512x512, etc.)",
+            "Clean, recognizable design",
+            "FuelTime branding elements",
+            "Works well at small sizes",
+            "Splash screens for different devices",
+            "Favicon for web browsers"
+          ],
+          "testRequirements": [
+            "Icons display correctly on home screen",
+            "Splash screens appear during app launch",
+            "Visual quality is high across sizes",
+            "Branding is consistent"
+          ],
+          "dependencies": ["task-0.3"],
+          "estimatedHours": 4,
+          "status": "pending"
+        },
+        {
+          "id": "task-6.2",
+          "title": "Configure service worker and offline functionality",
+          "description": "Enable app to work without internet connection",
+          "acceptanceCriteria": [
+            "Core features work offline",
+            "User data accessible without connection",
+            "Meal logging works offline",
+            "Timeline and insights available offline",
+            "Graceful handling of offline state",
+            "Data syncs when connection restored"
+          ],
+          "testRequirements": [
+            "App functions when network is disabled", 
+            "User experience remains smooth offline",
+            "No data loss during offline use",
+            "Online/offline transitions are seamless"
+          ],
+          "dependencies": ["task-0.3"],
+          "estimatedHours": 5,
+          "status": "pending"
+        },
+        {
+          "id": "task-6.3",
+          "title": "Implement push notification system",
+          "description": "Browser notifications for meal timing reminders",
+          "acceptanceCriteria": [
+            "Permission request flow",
+            "Eating window opening reminders",
+            "Meal timing suggestions",
+            "Window closing warnings (1 hour before)",
+            "Weekly summary notifications",
+            "User control over notification types"
+          ],
+          "testRequirements": [
+            "Notifications appear at correct times",
+            "Permission handling works properly",
+            "Users can customize notification preferences",
+            "Notifications work across browsers"
+          ],
+          "dependencies": ["task-6.2"],
+          "estimatedHours": 6,
+          "status": "pending"
+        },
+        {
+          "id": "task-6.4",
+          "title": "Add timeline draw animation",
+          "description": "Engaging animation for timeline first display",
+          "acceptanceCriteria": [
+            "Left-to-right timeline fill animation",
+            "600ms duration with smooth easing",
+            "Meal markers appear after timeline",
+            "Current time indicator slides into place",
+            "Animation only on first load or significant changes",
+            "Performance optimized (60fps)"
+          ],
+          "testRequirements": [
+            "Animation is smooth on all devices",
+            "No performance impact on low-end phones",
+            "Animation completes reliably",
+            "User can skip if desired"
+          ],
+          "dependencies": ["task-3.1"],
+          "estimatedHours": 4,
+          "status": "pending"
+        },
+        {
+          "id": "task-6.5",
+          "title": "Create success animations and micro-interactions",
+          "description": "Polish interactions with delightful feedback",
+          "acceptanceCriteria": [
+            "Meal logged: checkmark animation + card bounce",
+            "Button press: scale 0.95 + shadow reduce",
+            "Card tap: lift effect (translateY -4px)",
+            "Timing score improvement: celebration animation",
+            "Loading skeletons for async content",
+            "Smooth transitions between views"
+          ],
+          "testRequirements": [
+            "Animations enhance rather than distract",
+            "Performance remains smooth", 
+            "Animations work consistently",
+            "Accessible motion preferences respected"
+          ],
+          "dependencies": ["task-4.2"],
+          "estimatedHours": 5,
+          "status": "pending"
+        },
+        {
+          "id": "task-6.6",
+          "title": "Implement PWA install prompt",
+          "description": "Encourage users to install the app on their devices",
+          "acceptanceCriteria": [
+            "Custom install prompt design",
+            "Show after user has engaged (not immediately)",
+            "Clear value proposition for installation",
+            "Dismiss option that remembers preference",
+            "Works on iOS Safari and Android Chrome",
+            "Tracks installation metrics"
+          ],
+          "testRequirements": [
+            "Install prompt appears at appropriate time",
+            "Installation process works smoothly",
+            "Installed app functions properly",
+            "User preferences are respected"
+          ],
+          "dependencies": ["task-6.1"],
+          "estimatedHours": 4,
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "phase-7",
+      "name": "Testing & Launch",
+      "completionPromise": "PHASE_7_LAUNCH_COMPLETE",
+      "estimatedDuration": "1 week",
+      "description": "Comprehensive testing, optimization, and deployment",
+      "verificationChecklist": [
+        "Cross-browser testing passes on all major browsers",
+        "Accessibility audit meets WCAG AA standards",
+        "Performance scores >90 on Lighthouse",
+        "Beta testing feedback incorporated",
+        "SEO optimization complete",
+        "Production deployment successful"
+      ],
+      "tasks": [
+        {
+          "id": "task-7.1",
+          "title": "Comprehensive cross-browser testing",
+          "description": "Ensure app works across all major browsers and devices",
+          "acceptanceCriteria": [
+            "Chrome (desktop and mobile) - full functionality",
+            "Safari (desktop and iOS) - including PWA features",
+            "Firefox (desktop and mobile) - core features",
+            "Edge (desktop) - timeline and logging work",
+            "Test on iPhone, Android, tablet, desktop",
+            "Fix critical compatibility issues"
+          ],
+          "testRequirements": [
+            "All core features work on each platform",
+            "Visual design renders correctly",
+            "Performance is acceptable across devices",
+            "PWA installation works where supported"
+          ],
+          "dependencies": ["task-6.6"],
+          "estimatedHours": 8,
+          "status": "pending"
+        },
+        {
+          "id": "task-7.2",
+          "title": "Accessibility audit and improvements",
+          "description": "Ensure app is accessible to users with disabilities",
+          "acceptanceCriteria": [
+            "WCAG AA color contrast compliance",
+            "Keyboard navigation for all features",
+            "Screen reader compatibility",
+            "Focus indicators visible and logical",
+            "Alt text for all images and icons",
+            "Time displays accessible to different formats"
+          ],
+          "testRequirements": [
+            "Screen reader testing with NVDA/VoiceOver",
+            "Keyboard-only navigation test",
+            "Color contrast analyzer results",
+            "Accessibility testing tools pass"
+          ],
+          "dependencies": ["task-7.1"],
+          "estimatedHours": 6,
+          "status": "pending"
+        },
+        {
+          "id": "task-7.3",
+          "title": "Performance optimization and Lighthouse audit",
+          "description": "Optimize for speed and Lighthouse scores",
+          "acceptanceCriteria": [
+            "Lighthouse Performance score >90",
+            "Lighthouse Accessibility score >95",
+            "Lighthouse Best Practices score >90",
+            "Lighthouse SEO score >90",
+            "Bundle size optimization",
+            "Image optimization and lazy loading"
+          ],
+          "testRequirements": [
+            "All Lighthouse metrics meet targets",
+            "App loads quickly on 3G connection",
+            "No performance regressions",
+            "Bundle analysis shows reasonable sizes"
+          ],
+          "dependencies": ["task-7.2"],
+          "estimatedHours": 5,
+          "status": "pending"
+        },
+        {
+          "id": "task-7.4",
+          "title": "Create essential pages and policies",
+          "description": "Legal and informational pages required for launch",
+          "acceptanceCriteria": [
+            "Privacy policy explaining local storage use",
+            "About page with team and mission",
+            "FAQ section addressing common questions",
+            "Contact/feedback mechanism",
+            "Terms of service (simple, user-friendly)",
+            "Scientific references and citations page"
+          ],
+          "testRequirements": [
+            "All pages are accessible and load properly",
+            "Legal content is appropriate",
+            "Contact mechanism works",
+            "Navigation between pages functions"
+          ],
+          "dependencies": ["task-5.5"],
+          "estimatedHours": 4,
+          "status": "pending"
+        },
+        {
+          "id": "task-7.5",
+          "title": "Beta testing with target users",
+          "description": "Test with 20-50 real users and incorporate feedback",
+          "acceptanceCriteria": [
+            "Recruit 20-50 beta testers",
+            "Collect feedback on onboarding experience",
+            "Test meal logging workflows",
+            "Gather insights on educational content value",
+            "Identify any critical bugs or usability issues",
+            "Incorporate top feedback items"
+          ],
+          "testRequirements": [
+            "Beta testing process runs smoothly",
+            "Feedback is actionable and constructive",
+            "Critical issues are resolved",
+            "User satisfaction is positive"
+          ],
+          "dependencies": ["task-7.3"],
+          "estimatedHours": 10,
+          "status": "pending"
+        },
+        {
+          "id": "task-7.6",
+          "title": "Production deployment and monitoring setup",
+          "description": "Deploy to production with proper monitoring",
+          "acceptanceCriteria": [
+            "Deploy to Vercel with custom domain",
+            "Set up error logging (Sentry or similar)", 
+            "Configure analytics (Google Analytics 4)",
+            "Set up uptime monitoring",
+            "SSL certificate and security headers",
+            "Final performance verification in production"
+          ],
+          "testRequirements": [
+            "Production app loads and functions properly",
+            "Error logging captures issues",
+            "Analytics tracking works",
+            "Security headers are properly configured"
+          ],
+          "dependencies": ["task-7.5"],
+          "estimatedHours": 4,
+          "status": "pending"
+        }
+      ]
+    }
+  ],
+  "globalAcceptanceCriteria": [
+    "All unit tests pass with >90% coverage",
+    "No TypeScript compilation errors",
+    "Lighthouse scores >90 for Performance, Accessibility, Best Practices, SEO",
+    "Cross-browser compatibility verified on Chrome, Safari, Firefox",
+    "PWA installation and offline functionality working",
+    "User can complete full workflow from onboarding to meal logging in <2 minutes",
+    "App provides immediate value (eating window) in <30 seconds",
+    "All interactive elements are accessible via keyboard",
+    "Color contrast meets WCAG AA standards",
+    "No console errors in production build"
+  ],
+  "riskMitigation": [
+    "Algorithm accuracy validated against scientific research",
+    "Performance tested on low-end devices",
+    "Accessibility verified with screen readers", 
+    "Cross-browser issues caught in Phase 7 testing",
+    "User feedback incorporated through beta testing",
+    "Error boundaries prevent app crashes",
+    "Offline functionality ensures app works without internet"
+  ],
+  "successMetrics": [
+    "7-day user retention >50%",
+    "Time to first value <30 seconds",
+    "Daily active users show week-over-week growth", 
+    "User reports improved energy/performance",
+    "PWA install rate >20%",
+    "Tutorial completion rate >60%",
+    "Meal logging engagement >70% of active users"
+  ]
+}
