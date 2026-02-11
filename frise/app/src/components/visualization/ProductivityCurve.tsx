@@ -65,16 +65,24 @@ export function ProductivityCurve({
 }: ProductivityCurveProps) {
   const [showNowButton, setShowNowButton] = useState(false);
   
-  const [currentMinutes, setCurrentMinutes] = useState(() => {
-    const now = new Date();
-    return now.getHours() * 60 + now.getMinutes();
-  });
+  // Calculate minutes from midnight, treating 00:00-04:59 as "late night" (add 24h)
+  // This keeps the curve continuous from 5AM to 1AM next day
+  const getAdjustedMinutes = (date: Date) => {
+    const hours = date.getHours();
+    const mins = date.getMinutes();
+    // Before 5AM = still "yesterday" for the curve (add 24 hours)
+    if (hours < 5) {
+      return (hours + 24) * 60 + mins;
+    }
+    return hours * 60 + mins;
+  };
+
+  const [currentMinutes, setCurrentMinutes] = useState(() => getAdjustedMinutes(new Date()));
 
   // Update current time every minute
   useEffect(() => {
     const interval = setInterval(() => {
-      const now = new Date();
-      setCurrentMinutes(now.getHours() * 60 + now.getMinutes());
+      setCurrentMinutes(getAdjustedMinutes(new Date()));
     }, 60000);
     return () => clearInterval(interval);
   }, []);
@@ -88,7 +96,8 @@ export function ProductivityCurve({
           ? format(parseISO(point.time), "HH:mm")
           : point.time;
         const [h, m] = timeStr.split(":").map(Number);
-        const mins = h * 60 + m;
+        // Same adjustment: before 5AM = late night (add 24h)
+        const mins = h < 5 ? (h + 24) * 60 + m : h * 60 + m;
         
         return {
           time: timeStr,
@@ -136,8 +145,9 @@ export function ProductivityCurve({
     const endStr = format(parseISO(melatoninWindow.endTime), "HH:mm");
     const [sh, sm] = startStr.split(":").map(Number);
     const [eh, em] = endStr.split(":").map(Number);
-    const startMins = sh * 60 + sm;
-    const endMins = eh * 60 + em;
+    // Same late-night adjustment
+    const startMins = sh < 5 ? (sh + 24) * 60 + sm : sh * 60 + sm;
+    const endMins = eh < 5 ? (eh + 24) * 60 + em : eh * 60 + em;
     
     let startIdx = 0;
     let endIdx = allChartData.length - 1;
