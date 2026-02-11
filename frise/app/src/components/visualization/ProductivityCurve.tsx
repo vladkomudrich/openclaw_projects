@@ -280,7 +280,7 @@ export function ProductivityCurve({
             minWidth: '100%',
           }}
         >
-          <div className="w-full aspect-[2.5/1]">
+          <div className="w-full h-[140px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={allChartData}
@@ -349,9 +349,9 @@ export function ProductivityCurve({
                   />
                 )}
 
-                {/* Main curve with split coloring */}
+                {/* Main curve with split coloring - natural for smooth curves */}
                 <Area
-                  type="monotone"
+                  type="natural"
                   dataKey="value"
                   stroke="url(#strokeGrad)"
                   strokeWidth={2}
