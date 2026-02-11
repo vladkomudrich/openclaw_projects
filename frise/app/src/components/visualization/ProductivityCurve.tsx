@@ -12,8 +12,8 @@ import dynamic from "next/dynamic";
 const ChartComponent = dynamic(() => import("./ProductivityCurveChart"), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-[300px] flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-[var(--accent-purple)] border-t-transparent rounded-full animate-spin" />
+    <div className="w-full h-[140px] flex items-center justify-center">
+      <div className="w-6 h-6 border-2 border-[var(--accent-purple)] border-t-transparent rounded-full animate-spin" />
     </div>
   ),
 });

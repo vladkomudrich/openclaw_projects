@@ -88,14 +88,16 @@ export default function ProductivityCurveChart({
   }, [onPanStateChange]);
 
   // Split data into past and future for different colors
-  const { pastData, futureData, labels } = useMemo(() => {
+  const { pastData, futureData, nowMarkerData, labels } = useMemo(() => {
     const l = allChartData.map(d => d.displayTime);
     const past = allChartData.map(d => d.isPast ? d.value : null);
     const future = allChartData.map(d => !d.isPast ? d.value : null);
-    return { labels: l, pastData: past, futureData: future };
-  }, [allChartData]);
+    // Now marker: only show point at nowIndex
+    const nowMarker = allChartData.map((d, i) => i === nowIndex ? d.value : null);
+    return { labels: l, pastData: past, futureData: future, nowMarkerData: nowMarker };
+  }, [allChartData, nowIndex]);
 
-  // Chart data with two datasets (past grey, future colored)
+  // Chart data with three datasets (past grey, future colored, now marker)
   const chartData: ChartData<"line"> = useMemo(() => ({
     labels,
     datasets: [
@@ -121,8 +123,22 @@ export default function ProductivityCurveChart({
         pointRadius: 0,
         spanGaps: false,
       },
+      {
+        label: "Now",
+        data: nowMarkerData,
+        fill: false,
+        borderColor: "transparent",
+        backgroundColor: ACCENT_PURPLE,
+        borderWidth: 0,
+        pointRadius: 6,
+        pointBackgroundColor: ACCENT_PURPLE,
+        pointBorderColor: "#0A0A0F",
+        pointBorderWidth: 2,
+        pointHoverRadius: 8,
+        spanGaps: false,
+      },
     ],
-  }), [labels, pastData, futureData]);
+  }), [labels, pastData, futureData, nowMarkerData]);
 
   // Chart options
   const options: ChartOptions<"line"> = useMemo(() => ({
@@ -169,23 +185,6 @@ export default function ProductivityCurveChart({
       },
       annotation: {
         annotations: {
-          nowPoint: {
-            type: "point",
-            xValue: nowIndex,
-            yValue: allChartData[nowIndex]?.value ?? 50,
-            backgroundColor: ACCENT_PURPLE,
-            borderColor: "#0A0A0F",
-            borderWidth: 2,
-            radius: 5,
-          },
-          nowLabel: {
-            type: "label",
-            xValue: nowIndex,
-            yValue: Math.min(95, (allChartData[nowIndex]?.value ?? 50) + 10),
-            content: ["We're here"],
-            color: "rgba(255, 255, 255, 0.5)",
-            font: { size: 9 },
-          },
           ...(melatoninIndices ? {
             melatoninBox: {
               type: "box",
@@ -222,14 +221,14 @@ export default function ProductivityCurveChart({
 
   if (allChartData.length === 0) {
     return (
-      <div className="w-full h-[300px] flex items-center justify-center text-[var(--text-muted)]">
+      <div className="w-full h-[140px] flex items-center justify-center text-[var(--text-muted)]">
         No data available
       </div>
     );
   }
 
   return (
-    <div className="w-full h-[300px]" style={{ touchAction: "pan-x" }}>
+    <div className="w-full h-[140px]" style={{ touchAction: "pan-x" }}>
       <Line ref={chartRef} data={chartData} options={options} />
     </div>
   );
