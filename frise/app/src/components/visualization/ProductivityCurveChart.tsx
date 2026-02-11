@@ -9,11 +9,8 @@ import {
   LineElement,
   Filler,
   Tooltip,
-  Legend,
   ChartOptions,
   ChartData,
-  TooltipItem,
-  ScriptableLineSegmentContext,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import zoomPlugin from "chartjs-plugin-zoom";
@@ -27,7 +24,6 @@ ChartJS.register(
   LineElement,
   Filler,
   Tooltip,
-  Legend,
   zoomPlugin,
   annotationPlugin
 );
@@ -52,51 +48,25 @@ interface ProductivityCurveChartProps {
   onPanStateChange: (isPannedAway: boolean) => void;
 }
 
-// Thermal colors matching globals.css
-const THERMAL_COLORS = {
-  low: "#4A5568",      // --thermal-low
-  lowMid: "#5B8DEF",   // --thermal-low-mid
-  mid: "#7B68EE",      // --thermal-mid
-  high: "#9A8CF5",     // --thermal-high
-  peak: "#FFB347",     // --thermal-peak
-};
-
-const GREY_PAST = "#4A4A52";
 const ACCENT_PURPLE = "#7B68EE";
-
-const ZONE_THRESHOLDS = {
-  good: 75,
-  moderate: 50,
-  low: 25,
-};
-
-const PAN_THRESHOLD_MINUTES = 15;
-
-const ADVICE_MESSAGES: Record<string, string[]> = {
-  peak: ["🔥 Peak focus!", "💎 Deep work time.", "🎯 Max capacity."],
-  good: ["⚡ Great energy.", "✨ Solid focus.", "💪 Complex tasks."],
-  moderate: ["💫 Steady energy.", "☕ Break soon?", "📋 Admin tasks."],
-  low: ["🌙 Rest period.", "😴 Light work.", "🧘 Take a break."],
-};
+const PAN_THRESHOLD = 5; // index threshold
 
 export default function ProductivityCurveChart({
   allChartData,
   nowIndex,
   initialRange,
   melatoninIndices,
-  firstMinute,
-  lastMinute,
   showAnimation,
   onPanStateChange,
 }: ProductivityCurveChartProps) {
   const chartRef = useRef<ChartJS<"line">>(null);
+  const initialCenterRef = useRef((initialRange.min + initialRange.max) / 2);
 
   // Listen for reset event from parent
   useEffect(() => {
     const handleReset = () => {
       const chart = chartRef.current;
       if (!chart) return;
-      
       chart.zoomScale("x", { min: initialRange.min, max: initialRange.max }, "default");
       onPanStateChange(false);
     };
@@ -105,115 +75,84 @@ export default function ProductivityCurveChart({
     return () => window.removeEventListener("resetChartToNow", handleReset);
   }, [initialRange, onPanStateChange]);
 
-  // Handle pan to show/hide Now button
+  // Handle pan complete
   const handlePanComplete = useCallback(() => {
     const chart = chartRef.current;
     if (!chart) return;
     
     const xScale = chart.scales.x;
     const currentCenter = (xScale.min + xScale.max) / 2;
-    const nowCenter = nowIndex;
+    const diff = Math.abs(currentCenter - initialCenterRef.current);
     
-    // If panned more than threshold away from now, show button
-    const diff = Math.abs(currentCenter - nowCenter);
-    const minutesDiff = (diff / allChartData.length) * (lastMinute - firstMinute);
-    
-    onPanStateChange(minutesDiff > PAN_THRESHOLD_MINUTES);
-  }, [nowIndex, allChartData.length, firstMinute, lastMinute, onPanStateChange]);
+    onPanStateChange(diff > PAN_THRESHOLD);
+  }, [onPanStateChange]);
 
-  // Chart data
-  const chartData: ChartData<"line"> = useMemo(() => {
-    const labels = allChartData.map(d => d.displayTime);
-    const values = allChartData.map(d => d.value);
-    
-    return {
-      labels,
-      datasets: [
-        {
-          label: "Energy",
-          data: values,
-          fill: true,
-          tension: 0.4, // Smooth natural curve
-          pointRadius: 0,
-          pointHoverRadius: 6,
-          pointHoverBackgroundColor: ACCENT_PURPLE,
-          pointHoverBorderColor: "#0A0A0F",
-          pointHoverBorderWidth: 2,
-          borderWidth: 2,
-          segment: {
-            borderColor: (ctx: ScriptableLineSegmentContext) => {
-              const index = ctx.p0DataIndex;
-              if (allChartData[index]?.isPast) {
-                return GREY_PAST;
-              }
-              // Gradient based on value
-              const value = allChartData[index]?.value ?? 50;
-              if (value >= ZONE_THRESHOLDS.good) return THERMAL_COLORS.peak;
-              if (value >= ZONE_THRESHOLDS.moderate) return THERMAL_COLORS.high;
-              if (value >= ZONE_THRESHOLDS.low) return THERMAL_COLORS.mid;
-              return THERMAL_COLORS.lowMid;
-            },
-            backgroundColor: (ctx: ScriptableLineSegmentContext) => {
-              const index = ctx.p0DataIndex;
-              if (allChartData[index]?.isPast) {
-                return "rgba(74, 74, 82, 0.15)";
-              }
-              const value = allChartData[index]?.value ?? 50;
-              if (value >= ZONE_THRESHOLDS.good) return "rgba(255, 179, 71, 0.25)";
-              if (value >= ZONE_THRESHOLDS.moderate) return "rgba(154, 140, 245, 0.2)";
-              if (value >= ZONE_THRESHOLDS.low) return "rgba(123, 104, 238, 0.15)";
-              return "rgba(91, 141, 239, 0.1)";
-            },
-          },
-        },
-      ],
-    };
+  // Split data into past and future for different colors
+  const { pastData, futureData, labels } = useMemo(() => {
+    const l = allChartData.map(d => d.displayTime);
+    const past = allChartData.map(d => d.isPast ? d.value : null);
+    const future = allChartData.map(d => !d.isPast ? d.value : null);
+    return { labels: l, pastData: past, futureData: future };
   }, [allChartData]);
+
+  // Chart data with two datasets (past grey, future colored)
+  const chartData: ChartData<"line"> = useMemo(() => ({
+    labels,
+    datasets: [
+      {
+        label: "Past",
+        data: pastData,
+        fill: true,
+        tension: 0.4,
+        borderColor: "#5A5A62",
+        backgroundColor: "rgba(90, 90, 98, 0.2)",
+        borderWidth: 2,
+        pointRadius: 0,
+        spanGaps: false,
+      },
+      {
+        label: "Future",
+        data: futureData,
+        fill: true,
+        tension: 0.4,
+        borderColor: ACCENT_PURPLE,
+        backgroundColor: "rgba(123, 104, 238, 0.25)",
+        borderWidth: 2,
+        pointRadius: 0,
+        spanGaps: false,
+      },
+    ],
+  }), [labels, pastData, futureData]);
 
   // Chart options
   const options: ChartOptions<"line"> = useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
-    animation: showAnimation ? {
-      duration: 800,
-      easing: "easeOutQuart",
-    } : false,
-    interaction: {
-      mode: "index",
-      intersect: false,
-    },
+    animation: showAnimation ? { duration: 800, easing: "easeOutQuart" } : false,
+    interaction: { mode: "index", intersect: false },
     scales: {
       x: {
         type: "category",
         min: initialRange.min,
         max: initialRange.max,
-        grid: {
-          display: false,
-        },
+        grid: { display: false },
         ticks: {
           color: "rgba(255, 255, 255, 0.4)",
           font: { size: 9 },
           maxRotation: 0,
           autoSkip: true,
-          maxTicksLimit: 6,
+          maxTicksLimit: 5,
         },
-        border: {
-          display: false,
-        },
+        border: { display: false },
       },
       y: {
         min: 0,
         max: 100,
         display: false,
-        grid: {
-          display: false,
-        },
       },
     },
     plugins: {
-      legend: {
-        display: false,
-      },
+      legend: { display: false },
       tooltip: {
         enabled: true,
         backgroundColor: "rgba(20, 20, 25, 0.95)",
@@ -221,30 +160,15 @@ export default function ProductivityCurveChart({
         bodyColor: "rgba(255, 255, 255, 0.8)",
         borderColor: "rgba(255, 255, 255, 0.1)",
         borderWidth: 1,
-        cornerRadius: 12,
-        padding: 12,
+        cornerRadius: 8,
+        padding: 10,
         displayColors: false,
         callbacks: {
-          title: (items: TooltipItem<"line">[]) => {
-            return items[0]?.label || "";
-          },
-          label: (item: TooltipItem<"line">) => {
-            const idx = item.dataIndex;
-            const point = allChartData[idx];
-            const value = item.raw as number;
-            const messages = ADVICE_MESSAGES[point?.zone || "moderate"];
-            const message = messages[Math.floor(Date.now() / 10000) % messages.length];
-            
-            if (point?.isPast) {
-              return [`${value}%`];
-            }
-            return [`${value}%`, "", message];
-          },
+          label: (item) => `${Math.round(item.raw as number)}%`,
         },
       },
       annotation: {
         annotations: {
-          // "Now" dot marker
           nowPoint: {
             type: "point",
             xValue: nowIndex,
@@ -252,20 +176,16 @@ export default function ProductivityCurveChart({
             backgroundColor: ACCENT_PURPLE,
             borderColor: "#0A0A0F",
             borderWidth: 2,
-            radius: 6,
+            radius: 5,
           },
-          // "We're here" label
           nowLabel: {
             type: "label",
             xValue: nowIndex,
-            yValue: (allChartData[nowIndex]?.value ?? 50) + 12,
+            yValue: Math.min(95, (allChartData[nowIndex]?.value ?? 50) + 10),
             content: ["We're here"],
-            color: "rgba(255, 255, 255, 0.4)",
-            font: {
-              size: 9,
-            },
+            color: "rgba(255, 255, 255, 0.5)",
+            font: { size: 9 },
           },
-          // Melatonin window overlay
           ...(melatoninIndices ? {
             melatoninBox: {
               type: "box",
@@ -273,7 +193,7 @@ export default function ProductivityCurveChart({
               xMax: melatoninIndices.endIdx,
               yMin: 0,
               yMax: 100,
-              backgroundColor: "rgba(123, 104, 238, 0.08)",
+              backgroundColor: "rgba(123, 104, 238, 0.1)",
               borderWidth: 0,
             },
           } : {}),
@@ -288,24 +208,28 @@ export default function ProductivityCurveChart({
         zoom: {
           wheel: { enabled: false },
           pinch: { enabled: false },
-          drag: { enabled: false },
         },
         limits: {
           x: {
             min: 0,
             max: allChartData.length - 1,
-            minRange: Math.min(20, allChartData.length), // At least ~3h visible
+            minRange: 15,
           },
         },
       },
     },
   }), [allChartData, nowIndex, initialRange, melatoninIndices, showAnimation, handlePanComplete]);
 
+  if (allChartData.length === 0) {
+    return (
+      <div className="w-full h-[300px] flex items-center justify-center text-[var(--text-muted)]">
+        No data available
+      </div>
+    );
+  }
+
   return (
-    <div 
-      className={`w-full h-[300px] ${showAnimation ? 'animate-draw-in' : ''}`}
-      style={{ touchAction: "pan-x" }}
-    >
+    <div className="w-full h-[300px]" style={{ touchAction: "pan-x" }}>
       <Line ref={chartRef} data={chartData} options={options} />
     </div>
   );
